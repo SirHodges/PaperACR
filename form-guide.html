@@ -120,8 +120,8 @@ const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
 const stage=document.getElementById('stage'), canvas=document.getElementById('canvas'),
       pageImg=document.getElementById('pageImg'), zoneLayer=document.getElementById('zoneLayer');
-let page='front', scale=1, tx=0, ty=0;
-const MIN=1, MAX=5;
+let page='front', scale=1, tx=0, ty=0, fitS=1, IMGW=868, IMGH=1400;
+const MAXMULT=6;
 
 function loadPage(p){
   page=p;
@@ -130,28 +130,39 @@ function loadPage(p){
   zoneLayer.innerHTML=ZONES[p].map(z=>
     `<button class="zone" data-zone="${z.id}" style="left:${z.x}%;top:${z.y}%;width:${z.w}%;height:${z.h}%;${z.z?'z-index:'+z.z:''}">
        <span class="zlabel">${esc(z.title)}</span></button>`).join('');
+  canvas.style.width=IMGW+'px';
   fit();
+}
+function setImgSize(){
+  IMGW=pageImg.naturalWidth||IMGW; IMGH=pageImg.naturalHeight||IMGH;
+  canvas.style.width=IMGW+'px';
+}
+function computeFit(){
+  const sw=stage.clientWidth, sh=stage.clientHeight;
+  fitS=Math.min(sw/IMGW, sh/IMGH);
+  if(!isFinite(fitS)||fitS<=0) fitS=1;
 }
 function apply(){canvas.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;}
 function constrain(){
   const sw=stage.clientWidth, sh=stage.clientHeight;
-  const cw=canvas.offsetWidth*scale, ch=canvas.offsetHeight*scale;
+  const cw=IMGW*scale, ch=IMGH*scale;
   tx = cw<=sw ? (sw-cw)/2 : Math.min(0, Math.max(sw-cw, tx));
   ty = ch<=sh ? (sh-ch)/2 : Math.min(0, Math.max(sh-ch, ty));
 }
-function fit(){scale=MIN; tx=0; ty=0; constrain(); apply();}
+function fit(){computeFit(); scale=fitS; constrain(); apply();}
 function zoomAt(factor,px,py){
-  const ns=Math.min(MAX,Math.max(MIN,scale*factor)); const f=ns/scale;
+  const ns=Math.min(fitS*MAXMULT, Math.max(fitS, scale*factor)); const f=ns/scale;
   tx = px-(px-tx)*f; ty = py-(py-ty)*f; scale=ns; constrain(); apply();
 }
 
 // gestures
-const pts=new Map(); let lastDist=0, moved=false, multi=false;
+const pts=new Map(); let lastDist=0, moved=false, multi=false, downX=0, downY=0;
 function rel(e){const r=stage.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top};}
 stage.addEventListener('pointerdown',e=>{
   stage.setPointerCapture(e.pointerId);
-  if(pts.size===0){moved=false;multi=false;}
-  pts.set(e.pointerId, rel(e));
+  const p=rel(e);
+  if(pts.size===0){moved=false;multi=false;downX=p.x;downY=p.y;}
+  pts.set(e.pointerId, p);
   if(pts.size===2){multi=true;lastDist=0;}
 });
 stage.addEventListener('pointermove',e=>{
@@ -159,7 +170,7 @@ stage.addEventListener('pointermove',e=>{
   const p=rel(e), prev=pts.get(e.pointerId);
   if(pts.size===1){
     tx+=p.x-prev.x; ty+=p.y-prev.y; constrain(); apply();
-    if(Math.hypot(p.x-prev.x,p.y-prev.y)>1) moved=true;
+    if(Math.hypot(p.x-downX,p.y-downY)>8) moved=true;
   }
   pts.set(e.pointerId,p);
   if(pts.size===2){
@@ -182,7 +193,10 @@ document.getElementById('zoomIn').onclick=()=>zoomAt(1.4,stage.clientWidth/2,sta
 document.getElementById('zoomOut').onclick=()=>zoomAt(1/1.4,stage.clientWidth/2,stage.clientHeight/2);
 document.getElementById('zoomReset').onclick=fit;
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>loadPage(t.dataset.page));
-window.addEventListener('resize',()=>{constrain();apply();});
+window.addEventListener('resize',()=>{
+  const wasFit=Math.abs(scale-fitS)<0.001; computeFit();
+  scale = wasFit ? fitS : Math.max(fitS, scale); constrain(); apply();
+});
 
 // popup
 const overlay=document.getElementById('overlay'), popTitle=document.getElementById('popTitle'),
@@ -197,7 +211,7 @@ document.getElementById('popClose').onclick=closePop;
 overlay.addEventListener('click',e=>{if(e.target===overlay)closePop();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closePop();});
 
-pageImg.addEventListener('load',()=>{constrain();apply();});
+pageImg.addEventListener('load',()=>{setImgSize(); fit();});
 loadPage('front');
 </script>
 </body>
