@@ -210,14 +210,16 @@ window.addEventListener('resize',()=>{
 // popup
 const overlay=document.getElementById('overlay'), popTitle=document.getElementById('popTitle'),
       popBody=document.getElementById('popBody');
+let popOpenedAt=0;
 function openSection(id){
   const z=ZONES[page].find(s=>s.id===id); if(!z)return;
   popTitle.textContent=z.title; popBody.innerHTML=z.body; overlay.hidden=false;
+  popOpenedAt=Date.now();
   document.getElementById('popClose').focus();
 }
 function closePop(){overlay.hidden=true;}
 document.getElementById('popClose').onclick=closePop;
-overlay.addEventListener('click',e=>{if(e.target===overlay)closePop();});
+overlay.addEventListener('click',e=>{if(Date.now()-popOpenedAt<400)return; if(e.target===overlay)closePop();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closePop();});
 
 pageImg.addEventListener('load',()=>{setImgSize(); fit();});
