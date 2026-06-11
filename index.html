@@ -36,6 +36,8 @@
   .news{position:relative;display:flex;align-items:center;justify-content:center;
     background:var(--panel);color:var(--muted);border:1px solid var(--line);border-radius:9px;padding:9px 40px;margin-top:16px}
   .news .msg{min-width:0;text-align:center;font-weight:500;font-size:14px;color:#4c5853;transition:opacity .4s ease}
+  .news .msg a{color:var(--accent-ink);font-weight:600;text-decoration:underline}
+  .news .msg a:hover{color:var(--accent)}
   .news-x{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:transparent;
     color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:3px 6px;border-radius:6px}
   .news-x:hover{color:var(--ink);background:var(--field)}
@@ -51,13 +53,13 @@
   .tbtn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
   .tbtn.primary:hover{background:#0b1614}
   .tbtn.primary svg{flex:0 0 auto}
-  .tbtn.faq{flex-direction:column;gap:3px}
+  .tbtn.faq,.tbtn.qref{flex-direction:column;gap:3px}
   .faq-main{display:flex;align-items:center;gap:7px}
-  .faq-updated{font:600 10px 'JetBrains Mono',monospace;color:rgba(255,255,255,.78);letter-spacing:.02em}
-  .faq-updated.fresh{color:#3a2f00;background:#ffd98a;padding:2px 8px;border-radius:999px;
+  .faq-updated,.qref-note{font:600 10px 'JetBrains Mono',monospace;color:rgba(255,255,255,.78);letter-spacing:.02em}
+  .faq-updated.fresh,.qref-note.fresh{color:#3a2f00;background:#ffd98a;padding:2px 8px;border-radius:999px;
     animation:freshpulse 1.2s ease-in-out infinite}
   @keyframes freshpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,217,138,.7)}50%{box-shadow:0 0 0 6px rgba(255,217,138,0)}}
-  @media (prefers-reduced-motion:reduce){.faq-updated.fresh{animation:none}}
+  @media (prefers-reduced-motion:reduce){.faq-updated.fresh,.qref-note.fresh{animation:none}}
 
   /* search */
   .searchbar{position:sticky;top:0;z-index:10;padding:12px 0 10px;
@@ -130,6 +132,11 @@
   .modal-head{display:flex;align-items:center;justify-content:space-between;
     padding:20px 22px 14px;border-bottom:1px solid var(--line)}
   .modal-head h2{font-family:'Archivo';font-weight:800;font-size:20px;margin:0;letter-spacing:-.01em}
+  .mh-left{display:flex;align-items:center;gap:10px;min-width:0}
+  .modal-back{border:0;background:var(--field);width:32px;height:32px;border-radius:9px;cursor:pointer;
+    color:var(--muted);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .modal-back:hover{background:#e6ece9;color:var(--ink)}
+  .modal-back[hidden]{display:none}
   .x{border:0;background:var(--field);width:34px;height:34px;border-radius:9px;cursor:pointer;
     font-size:20px;line-height:1;color:var(--muted)}
   .x:hover{background:#e6ece9;color:var(--ink)}
@@ -147,6 +154,34 @@
     color:var(--accent-ink);font:600 14px 'Inter';background:var(--field);border:1px solid var(--line);
     border-radius:10px;padding:12px 14px}
   .hlinks a:hover{border-color:var(--accent);background:#eaf3f0}
+
+  /* other tools grid */
+  .toolgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:4px}
+  .toolopt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;min-height:74px;
+    border:1px solid var(--line);border-radius:12px;background:var(--field);cursor:pointer;text-decoration:none;
+    color:var(--ink);padding:12px}
+  .toolopt-t{font:700 14px 'Inter'}
+  .toolopt-sub{font:600 11px 'JetBrains Mono',monospace;color:var(--muted);letter-spacing:.02em}
+  .toolopt:hover{border-color:var(--accent);background:#eaf3f0;color:var(--accent-ink)}
+  .toolopt.is-empty{border-style:dashed;background:transparent;cursor:default;opacity:.5}
+  .toolopt.is-empty:hover{border-color:var(--line);background:transparent;color:var(--ink)}
+  @media (max-width:480px){.toolgrid{grid-template-columns:1fr}}
+
+  /* abbreviations */
+  .ab-intro{color:var(--muted);font-size:13.5px;margin:2px 0 4px}
+  .abrow{display:grid;grid-template-columns:104px 1fr;gap:12px;align-items:baseline;
+    padding:6px 0;border-bottom:1px solid var(--field)}
+  .ab-c{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13.5px;color:var(--accent-ink)}
+  .ab-d{font-size:14px;color:var(--ink)}
+  @media (max-width:480px){.abrow{grid-template-columns:84px 1fr;gap:10px}.ab-c{font-size:12.5px}}
+
+  /* quick reference — hospital collapsible */
+  .qr-hosp{margin-top:14px;border-top:1px solid var(--line);padding-top:6px}
+  .qr-hosp>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;
+    gap:10px;padding:10px 0;font:700 15px 'Inter';color:var(--ink)}
+  .qr-hosp>summary::-webkit-details-marker{display:none}
+  .qr-hosp .chev{color:var(--muted);transition:transform .2s}
+  .qr-hosp[open] .chev{transform:rotate(180deg)}
 
   /* quick reference */
   .qr-row{display:grid;grid-template-columns:160px 1fr;gap:14px;padding:12px 0;
@@ -243,13 +278,16 @@
       </span>
       <span class="faq-updated" id="faqUpdated"></span>
     </a>
-    <button class="tbtn primary" id="quickrefBtn">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a2 2 0 0 1 2 2v14l-4-3-4 3V6a2 2 0 0 0-2-2H4z"/><path d="M4 4v14a2 2 0 0 0 2 2h2"/></svg>
-      Quick reference
+    <button class="tbtn primary qref" id="quickrefBtn" data-moved="2026-06-11">
+      <span class="faq-main">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a2 2 0 0 1 2 2v14l-4-3-4 3V6a2 2 0 0 0-2-2H4z"/><path d="M4 4v14a2 2 0 0 0 2 2h2"/></svg>
+        Quick reference
+      </span>
+      <span class="qref-note" id="qrefNote"></span>
     </button>
-    <button class="tbtn primary" id="hospitalBtn">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/><path d="M9 9v.01M9 12v.01M9 15v.01"/></svg>
-      Hospital codes
+    <button class="tbtn primary" id="otherToolsBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h4l2-2h6l2 2h4v12H3z"/><circle cx="12" cy="13" r="3"/></svg>
+      Other Tools
     </button>
   </div>
 
@@ -302,7 +340,12 @@
 <div class="overlay" id="overlay">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-head">
-      <h2 id="modalTitle">Hospital codes</h2>
+      <div class="mh-left">
+        <button class="modal-back" id="modalBack" aria-label="Back" hidden>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <h2 id="modalTitle">Quick reference</h2>
+      </div>
       <button class="x" id="closeModal" aria-label="Close">&times;</button>
     </div>
     <div class="modal-body" id="modalBody"></div>
@@ -407,22 +450,25 @@ list.addEventListener('click',e=>{
 const overlay=document.getElementById('overlay'), modalBody=document.getElementById('modalBody'),
       modalTitle=document.getElementById('modalTitle');
 function hrows(arr){return arr.map(h=>`<div class="hrow"><span class="hcode">${esc(h.c)}</span><span class="hname">${esc(h.t)}</span></div>`).join('');}
-function showModal(title,bodyHTML){
-  modalTitle.textContent=title; modalBody.innerHTML=bodyHTML;
+function showModal(title,bodyHTML,backFn){
+  modalTitle.textContent=title; modalBody.innerHTML=bodyHTML; modalBody.scrollTop=0;
+  const mb=document.getElementById('modalBack');
+  if(backFn){ mb.hidden=false; mb._fn=backFn; } else { mb.hidden=true; mb._fn=null; }
   overlay.classList.add('open'); document.getElementById('closeModal').focus();
 }
 function closeModal(){overlay.classList.remove('open');}
 
-function openHospital(){
-  showModal('Hospital codes',
-    `<div class="grouplabel">Receiving facilities</div>${hrows(HOSPITALS)}` +
-    `<div class="grouplabel">More hospital codes</div>
+const HOSP_LINKS=`<div class="grouplabel">More hospital codes</div>
      <div class="hlinks">
        <a href="https://www.ontario.ca/page/ministry-reports-master-numbering-system" target="_blank" rel="noopener">Ministry Master Numbering System
          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H9M17 7v8"/></svg></a>
        <a href="https://www.ontario.ca/files/2026-04/moh-2026-master-numbering-system-codes-en-2026-04-09.xlsx" target="_blank" rel="noopener">Full code list — Excel (April 2026)
          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg></a>
-     </div>`);
+     </div>`;
+function hospitalBlock(){
+  return `<details class="qr-hosp"><summary>Hospital codes — receiving facilities
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+    <div>${hrows(HOSPITALS)}${HOSP_LINKS}</div></details>`;
 }
 
 const QUICKREF=[
@@ -450,12 +496,76 @@ function openQuickref(){
     }
     return `<div class="qr-row"><span class="qr-label">${esc(r.l)}</span><span>${val}</span></div>`;
   }).join('');
-  showModal('Quick reference', body);
+  showModal('Quick reference', body + hospitalBlock());
 }
 
-document.getElementById('hospitalBtn').addEventListener('click',openHospital);
+/* ----- Other tools ----- */
+const ABBREV=[
+ ["General Documentation",[
+   ["ACR","Ambulance Call Report"],["eACR","Electronic Ambulance Call Report"],
+   ["ePCR","Electronic Paramedic Call Report"],["CNO","Could Not Obtain"],
+   ["NKA","No Known Allergies"],["DNR","Do Not Resuscitate"],["SDM","Substitute Decision Maker"],
+   ["TOC","Transfer of Care"],["PHI","Personal Health Information"],
+   ["QA / CQI","Quality Assurance / Continuous Quality Improvement"],
+   ["ODDPS","Ontario Data Dictionary for Paramedic Services"],["MOH","Ministry of Health"],
+   ["ASO","Ambulance Service Operator"],
+   ["CACC / ACS","Central Ambulance Communications Centre / Ambulance Communication Service"],
+   ["ACO","Ambulance Communications Officer"],["CTAS","Canadian Triage and Acuity Scale"],
+   ["PHIPA","Personal Health Information Protection Act"],["CAS","Children's Aid Society"]]],
+ ["Patient Assessment & Vital Signs",[
+   ["BP","Blood Pressure"],["GCS","Glasgow Coma Scale"],["SpO2","Pulse Oximetry (oxygen saturation)"],
+   ["ETCO2","End-tidal Carbon Dioxide"],["ECG","Electrocardiogram"],["HR","Heart Rate"],
+   ["RR","Respiration Rate"],["VSA","Vital Signs Absent"],["ROSC","Return of Spontaneous Circulation"]]],
+ ["Clinical Conditions",[
+   ["SOB","Shortness of Breath"],["CVA","Cerebrovascular Accident (\"Stroke\")"],
+   ["COPD","Chronic Obstructive Pulmonary Disease"],["STEMI","ST-segment Elevation Myocardial Infarction"],
+   ["ALOC / ALC","Altered Level of Consciousness"],["LOC","Level of Consciousness"],
+   ["CPR","Cardiopulmonary Resuscitation"],["TOR","Termination of Resuscitation"],
+   ["FREI","Febrile Respiratory/Enteric Illness"],["LVO","Large Vessel Occlusion"]]],
+ ["Procedures & Treatments",[
+   ["IV","Intravenous"],["SMR","Spinal Motion Restriction"],["C-spine","Cervical Spine"],
+   ["PCI","Percutaneous Coronary Intervention"],["EVT","Endovascular Therapy"],
+   ["AED","Automated External Defibrillator"],["O2","Oxygen"]]],
+ ["Personnel & Levels of Care",[
+   ["PCP","Primary Care Paramedic"],["ACP","Advanced Care Paramedic"],["CCP","Critical Care Paramedic"],
+   ["EMA","Emergency Medical Attendant"],["BLS PCS","Basic Life Support Patient Care Standards"],
+   ["ALS PCS","Advanced Life Support Patient Care Standards"]]],
+ ["Scales & Scoring",[
+   ["LAMS","Los Angeles Motor Scale"],["CTAS","Canadian Triage and Acuity Scale"],
+   ["GCS","Glasgow Coma Scale"],["APGAR","Neonatal scoring (ACR reverse side)"]]],
+ ["Measurements",[
+   ["kg","Kilogram"],["mL","Millilitre"],["L","Litre"],["km","Kilometre"],["hr","Hour"],
+   ["mEq","Milliequivalent"],["mmol","Millimole"],["M / F","Male / Female"],
+   ["Y / M / D","Years / Months / Days (patient age)"]]],
+];
+function openAbbrev(){
+  const body=`<p class="ab-intro">Approved shorthand for ACR documentation.</p>`+
+    ABBREV.map(([cat,rows])=>`<div class="grouplabel">${esc(cat)}</div>`+
+      rows.map(([c,d])=>`<div class="abrow"><span class="ab-c">${esc(c)}</span><span class="ab-d">${esc(d)}</span></div>`).join('')
+    ).join('');
+  showModal('Ministry approved abbreviations', body, openOtherTools);
+}
+function openOtherTools(){
+  const opts=[
+    {t:"Ministry Approved abbreviations", act:"abbrev"},
+    {t:"Submit a question", sub:"External link to MS Forms", href:"https://forms.cloud.microsoft/r/gssS0sBkaZ"},
+    null,null,null,null
+  ];
+  const body=`<div class="toolgrid">`+opts.map(o=>{
+    if(!o) return `<button class="toolopt is-empty" disabled aria-label="Reserved for a future tool"></button>`;
+    const inner=`<span class="toolopt-t">${esc(o.t)}</span>`+(o.sub?`<span class="toolopt-sub">${esc(o.sub)}</span>`:'');
+    return o.href
+      ? `<a class="toolopt" href="${o.href}" target="_blank" rel="noopener">${inner}</a>`
+      : `<button class="toolopt" data-act="${o.act}">${inner}</button>`;
+  }).join('')+`</div>`;
+  showModal('Other tools', body);
+}
+
+document.getElementById('otherToolsBtn').addEventListener('click',openOtherTools);
 document.getElementById('quickrefBtn').addEventListener('click',openQuickref);
 document.getElementById('closeModal').addEventListener('click',closeModal);
+document.getElementById('modalBack').addEventListener('click',()=>{const mb=document.getElementById('modalBack'); if(mb._fn) mb._fn();});
+modalBody.addEventListener('click',e=>{const b=e.target.closest('[data-act]'); if(b && b.dataset.act==='abbrev') openAbbrev();});
 overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
@@ -545,6 +655,19 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape' && !queueView.hidden
   if(days<=7 && days>=-7) el.classList.add('fresh');
 })();
 
+/* ---- Quick reference "now with hospital codes" flash (auto-hides after 14 days) ---- */
+(function(){
+  const btn=document.getElementById('quickrefBtn'), el=document.getElementById('qrefNote');
+  if(!btn||!el) return;
+  const iso=btn.getAttribute('data-moved');
+  const d=iso?new Date(iso+'T00:00:00'):null;
+  if(!d||isNaN(d)){ el.remove(); return; }
+  const today=new Date(); today.setHours(0,0,0,0);
+  const days=(today-d)/86400000;
+  if(days<=14 && days>=-7){ el.textContent='Now with hospital codes!'; el.classList.add('fresh'); }
+  else { el.remove(); }
+})();
+
 /* ---- news banner rotation ---- */
 (function(){
   const banner=document.getElementById('news'), msgEl=document.getElementById('newsMsg'),
@@ -553,13 +676,13 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape' && !queueView.hidden
   if(!NEWS.length){ banner.style.display='none'; return; }
   const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
   let i=0, timer=null;
-  msgEl.textContent=NEWS[0];
+  msgEl.innerHTML=NEWS[0];
   if(NEWS.length>1){
     timer=setInterval(()=>{
       i=(i+1)%NEWS.length;
-      if(reduce){ msgEl.textContent=NEWS[i]; return; }
+      if(reduce){ msgEl.innerHTML=NEWS[i]; return; }
       msgEl.style.opacity=0;
-      setTimeout(()=>{ msgEl.textContent=NEWS[i]; msgEl.style.opacity=1; }, 400);
+      setTimeout(()=>{ msgEl.innerHTML=NEWS[i]; msgEl.style.opacity=1; }, 400);
     }, NEWS_ROTATE_MS);
   }
   if(closeBtn) closeBtn.addEventListener('click',()=>{ if(timer)clearInterval(timer); banner.style.display='none'; });
