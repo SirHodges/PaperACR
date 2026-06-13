@@ -12,6 +12,10 @@
     --bg:#eef2f1; --panel:#ffffff; --ink:#13201d; --muted:#5d6f6a;
     --line:#dde5e2; --field:#f3f6f5; --accent:#0f766e; --accent-ink:#0b5a54;
   }
+  :root.dark{
+    --bg:#0e1513; --panel:#172420; --ink:#e7efeb; --muted:#94a8a1;
+    --line:#2a3a34; --field:#1f2d28; --accent:#1aa18f; --accent-ink:#5fd0bf;
+  }
   *{box-sizing:border-box}
   html,body{margin:0}
   body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;
@@ -45,10 +49,14 @@
   .faq-item[open] summary{border-bottom:1px solid var(--line)}
   .answer{padding:16px 20px 20px;font-size:15.5px;line-height:1.65;color:var(--ink)}
   .answer p{margin:0}
+  .answer ul{margin:10px 0 0;padding-left:22px}
+  .answer li{margin:3px 0}
+  .answer ul+p{margin-top:10px}
   .answer a{color:var(--accent-ink);font-weight:600;text-decoration:underline}
   .answer a:hover{color:var(--accent)}
   @media (prefers-reduced-motion:reduce){.chev{transition:none}}
 </style>
+<script>(function(){try{var t=localStorage.getItem('acr-theme');if(!t)t=(window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches)?'dark':'light';if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
@@ -117,6 +125,22 @@
   </details>
 
   <details class="faq-item">
+    <summary>Have there been any change in the procedure for reporting elder abuse?
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="answer">
+      <p>No changes to the procedure! Call the Vulnerable Persons Reporting Line at 613‑580‑2424 ext. 23499 and leave a voicemail with:</p>
+      <ul>
+        <li>Truck number</li>
+        <li>Date of pick-up</li>
+        <li>Address of pick-up</li>
+        <li>Call number</li>
+      </ul>
+      <p>Do not include any patient information in the voicemail. They'll track down the form and go from there.</p>
+    </div>
+  </details>
+
+  <details class="faq-item">
     <summary>Why do we need to stop the SMART program for now?
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </summary>
@@ -125,15 +149,6 @@
     </div>
   </details>
 
-    <details class="faq-item">
-    <summary>Should Operations continue to email referrals to CP while on paper ACRs?
-      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-    </summary>
-    <div class="answer">
-      <p>Yes, continue to submit your referrals to CommunityParamedicine@Ottawa.ca with the call number (no PHI please) and CP will process them as we work through filing. </p>
-    </div>
-  </details>
-  
   <details class="faq-item">
     <summary>Why do we need to stop the studies?
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>

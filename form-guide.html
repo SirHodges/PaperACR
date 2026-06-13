@@ -12,6 +12,13 @@
     --bg:#eef2f1; --panel:#ffffff; --ink:#13201d; --muted:#5d6f6a;
     --line:#dde5e2; --field:#f3f6f5; --accent:#0f766e; --accent-ink:#0b5a54;
   }
+  :root.dark{
+    --bg:#0e1513; --panel:#172420; --ink:#e7efeb; --muted:#94a8a1;
+    --line:#2a3a34; --field:#1f2d28; --accent:#1aa18f; --accent-ink:#5fd0bf;
+  }
+  :root.dark .stage{background:#0b110f}
+  :root.dark .tab[aria-selected="true"]{background:#1e2d28;color:#eef4f1}
+  :root.dark .x:hover{background:#22302b}
   *{box-sizing:border-box}
   [hidden]{display:none!important}
   html,body{margin:0;height:100%}
@@ -88,6 +95,7 @@
   }
   @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
+<script>(function(){try{var t=localStorage.getItem('acr-theme');if(!t)t=(window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches)?'dark':'light';if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();</script>
 </head>
 <body>
   <div class="bar">
