@@ -271,18 +271,28 @@
   .foot-btn.ok{border-color:var(--accent);color:var(--accent-ink)}
   .foot-btn:disabled{opacity:.45;cursor:default}
   .foot-btn:disabled:hover{border-color:var(--line);color:var(--ink)}
-  .qline{display:grid;grid-template-columns:28px auto 1fr auto;align-items:center;gap:12px;
-    padding:12px 10px;border-bottom:1px solid var(--line)}
-  .qnum{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--muted);font-size:13.5px;text-align:right}
-  .qcode{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:17px;color:var(--accent-ink);
-    background:var(--field);border:1px solid var(--line);padding:5px 9px;border-radius:8px;min-width:56px;text-align:center}
-  .qdesc{font-weight:600;font-size:15px}
-  .qctrl{display:flex;gap:6px}
-  .qbtn{width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:var(--panel);
-    cursor:pointer;font-size:17px;line-height:1;color:var(--muted);display:flex;align-items:center;justify-content:center}
+  .qhint{display:flex;align-items:center;gap:6px;padding:8px 12px 4px;font-size:12px;color:var(--muted)}
+  .qhint svg{width:14px;height:14px;opacity:.8;flex:0 0 auto}
+  .qline{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid var(--line);
+    user-select:none;-webkit-user-select:none}
+  .qline.lift{background:var(--field);border-radius:10px;border-bottom-color:transparent;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  .qhandle{display:inline-flex;align-items:center;gap:3px;flex:0 0 auto;color:var(--muted);cursor:grab;
+    touch-action:none;padding:5px 2px;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+  .qhandle:active{cursor:grabbing}
+  .qhandle svg{opacity:.75;flex:0 0 auto}
+  .qnum{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:var(--muted);min-width:14px;text-align:right}
+  .qcode{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;color:var(--accent-ink);
+    background:var(--field);border:1px solid var(--line);padding:3px 7px;border-radius:7px;min-width:46px;text-align:center;flex:0 0 auto}
+  .qdesc{flex:1;min-width:0;font-weight:600;font-size:14px;line-height:1.3;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .qctrl{display:flex;gap:6px;flex:0 0 auto}
+  .qbtn{width:34px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--panel);
+    cursor:pointer;font-size:16px;line-height:1;color:var(--muted);display:flex;align-items:center;justify-content:center}
   .qbtn:hover{border-color:var(--accent);color:var(--ink)}
   .qbtn:disabled{opacity:.3;cursor:default}
   .qbtn.del:hover{border-color:var(--add);color:var(--add);background:var(--add-bg)}
+  .qbtn.arrow{display:none}
+  @media (min-width:600px){ .qbtn.arrow{display:flex} .qhint{display:none} }
   .sheet-empty{text-align:center;color:var(--muted);padding:64px 20px}
   .sheet-empty b{display:block;font-family:'Archivo';font-weight:700;color:var(--ink);font-size:18px;margin-bottom:6px}
 
@@ -628,6 +638,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
 /* ---- selection queue ---- */
 let selected=[], lastCleared=null, toastTimer=null;
+const GRIP='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="5" r="1.55"/><circle cx="15" cy="5" r="1.55"/><circle cx="9" cy="12" r="1.55"/><circle cx="15" cy="12" r="1.55"/><circle cx="9" cy="19" r="1.55"/><circle cx="15" cy="19" r="1.55"/></svg>';
 const dock=document.getElementById('dock'), dockCount=document.getElementById('dockCount'),
       queueView=document.getElementById('queueView'), queueList=document.getElementById('queueList'),
       queueTitle=document.getElementById('queueTitle'),
@@ -675,13 +686,14 @@ function renderQueue(){
     queueList.innerHTML='<div class="sheet-empty"><b>No codes selected yet</b>Tap any result to add it here, in order.</div>';
     return;
   }
-  queueList.innerHTML=selected.map((d,i)=>`<div class="qline">
-      <span class="qnum">${i+1}</span>
+  queueList.innerHTML='<div class="qhint">'+GRIP+'Hold and drag the left edge to reorder</div>'+
+    selected.map((d,i)=>`<div class="qline" data-i="${i}">
+      <span class="qhandle" aria-label="Drag to reorder">${GRIP}<span class="qnum">${i+1}</span></span>
       <span class="qcode">${esc(d.c)}</span>
       <span class="qdesc">${esc(d.t)}</span>
       <span class="qctrl">
-        <button class="qbtn" data-act="up" data-i="${i}" ${i===0?'disabled':''} aria-label="Move up">&uarr;</button>
-        <button class="qbtn" data-act="down" data-i="${i}" ${i===selected.length-1?'disabled':''} aria-label="Move down">&darr;</button>
+        <button class="qbtn arrow" data-act="up" data-i="${i}" ${i===0?'disabled':''} aria-label="Move up">&uarr;</button>
+        <button class="qbtn arrow" data-act="down" data-i="${i}" ${i===selected.length-1?'disabled':''} aria-label="Move down">&darr;</button>
         <button class="qbtn" data-act="dup" data-i="${i}" aria-label="Duplicate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
         <button class="qbtn del" data-act="del" data-i="${i}" aria-label="Remove">&times;</button>
       </span></div>`).join('');
@@ -697,6 +709,56 @@ queueList.addEventListener('click',e=>{
   else if(b.dataset.act==='dup')dup(i);
   else removeAt(i);
 });
+
+/* ---- hold-and-drag reordering (handle on the left) ---- */
+(function(){
+  const HOLD_MS=110, MOVE_ACTIVATE=5;
+  let dragRow=null, holdTimer=null, startY=0, pendRow=null, pendHandle=null, capId=null;
+  const rows=()=>[...queueList.querySelectorAll('.qline')];
+
+  function activate(){
+    if(dragRow||!pendRow) return;
+    clearTimeout(holdTimer); holdTimer=null;
+    dragRow=pendRow; dragRow.classList.add('lift');
+    try{ pendHandle.setPointerCapture(capId); }catch(_){ }
+  }
+  function onMove(e){
+    if(!dragRow){
+      if(Math.abs(e.clientY-startY)>MOVE_ACTIVATE) activate();
+      if(!dragRow) return;
+    }
+    const y=e.clientY; let ref=null;
+    for(const r of rows()){
+      if(r===dragRow) continue;
+      const box=r.getBoundingClientRect();
+      if(y < box.top+box.height/2){ ref=r; break; }
+    }
+    if(ref){ if(ref!==dragRow.nextSibling) queueList.insertBefore(dragRow,ref); }
+    else queueList.appendChild(dragRow);
+  }
+  function endDrag(){
+    clearTimeout(holdTimer); holdTimer=null;
+    document.removeEventListener('pointermove',onMove,true);
+    document.removeEventListener('pointerup',endDrag,true);
+    document.removeEventListener('pointercancel',endDrag,true);
+    if(pendHandle&&capId!=null){ try{pendHandle.releasePointerCapture(capId);}catch(_){ } }
+    if(dragRow){
+      dragRow.classList.remove('lift');
+      const next=rows().map(r=>selected[+r.dataset.i]);
+      dragRow=null; selected=next; renderQueue();
+    }
+    pendRow=null; pendHandle=null; capId=null;
+  }
+  queueList.addEventListener('pointerdown',e=>{
+    const handle=e.target.closest('.qhandle'); if(!handle) return;
+    const row=handle.closest('.qline'); if(!row) return;
+    startY=e.clientY; pendRow=row; pendHandle=handle; capId=e.pointerId;
+    document.addEventListener('pointermove',onMove,true);
+    document.addEventListener('pointerup',endDrag,true);
+    document.addEventListener('pointercancel',endDrag,true);
+    holdTimer=setTimeout(activate,HOLD_MS);
+  });
+})();
 document.getElementById('viewListBtn').addEventListener('click',openQueue);
 document.getElementById('addMoreBtn').addEventListener('click',closeQueue);
 document.getElementById('dockClear').addEventListener('click',clearAll);
