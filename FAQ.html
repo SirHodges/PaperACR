@@ -38,6 +38,11 @@
   h1{font-family:'Archivo';font-weight:800;font-size:clamp(26px,6vw,36px);letter-spacing:-.02em;margin:0}
   .sub{color:var(--muted);margin:9px 0 0;font-size:15px}
 
+  /* category headers */
+  .cat{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:700;margin:30px 2px 4px;padding-top:14px;border-top:1px solid var(--line)}
+  .cat:first-of-type{margin-top:18px;padding-top:0;border-top:0}
+
   /* faq items */
   .faq-item{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-top:12px;overflow:hidden}
   .faq-item summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;
@@ -79,6 +84,17 @@
   </header>
 
   <!-- To add a question, copy one block below and edit the text. -->
+  <h2 class="cat">Filling out the ACR</h2>
+
+  <details class="faq-item">
+    <summary>Can you give us a "Mandatory Fields" guide?
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="answer">
+      <p>All fields on the paper form are mandatory. There should not be any blank fields once the ACR is complete. Use CNO or an initialed strikethrough for sections that can't be completed.</p>
+    </div>
+  </details>
+
   <details class="faq-item">
     <summary>What do I do if I run out of space in the Clinical Treatment / Procedures section?
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
@@ -116,11 +132,40 @@
   </details>
 
   <details class="faq-item">
+    <summary>What do I write in the demographics for a code 71?
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="answer">
+      <p>In the demographics section, add 'CNO' to the Name, Age, DOB, and Health Card Number fields.</p>
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary>What goes in the signature box for a code 72 with no signature?
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="answer">
+      <p>Write 'CNO' in the signature box — please don't leave it blank.</p>
+    </div>
+  </details>
+
+  <h2 class="cat">Specific calls & procedures</h2>
+
+  <details class="faq-item">
     <summary>Should I be transmitting my defib data?
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </summary>
     <div class="answer">
       <p>Yes, please — keep uploading it every time. The data uploads to Stryker, who hold it for us for up to 30 days.</p>
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary>Do we need to call dispatch with VSA information?
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="answer">
+      <p>Yes please. They need to know if suspicious or not, pt name, code 5 vs code 6, BHP name/number if it's a pronouncement.</p>
     </div>
   </details>
 
@@ -137,6 +182,17 @@
         <li>Call number</li>
       </ul>
       <p>Do not include any patient information in the voicemail. They'll track down the form and go from there.</p>
+    </div>
+  </details>
+
+  <h2 class="cat">Background & program updates</h2>
+
+  <details class="faq-item">
+    <summary>Why do I need to fill out the trip sheet?
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="answer">
+      <p>CAD data isn't stored. That trip sheet is now your record of what calls you did that day. 20 years in the future, that trip sheet is still stored in the event the lawyers or ministry needs to find the information. <i>PS note: we also use them to track compliment letters (cause patients are NOT good at remembering your names)</i></p>
     </div>
   </details>
 
