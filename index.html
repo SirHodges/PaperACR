@@ -110,6 +110,7 @@
   .chip:hover{border-color:var(--accent)}
   .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
   .chip.common-chip[aria-pressed="true"]{background:var(--common);border-color:var(--common)}
+  .chip.recent-chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
   .count{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
 
   /* results */
@@ -353,6 +354,7 @@
     <div class="controls">
       <button class="chip" data-f="all" aria-pressed="true">All</button>
       <button class="chip common-chip" data-f="common" aria-pressed="false">★ Common</button>
+      <button class="chip recent-chip" data-f="recent" aria-pressed="false" hidden>Recent</button>
       <span class="count" id="count" aria-live="polite"></span>
     </div>
   </div>
@@ -422,6 +424,8 @@ const DATA = [{"c": "00", "t": "At Base", "cat": "Status Codes", "src": "form", 
 /* ===== Banner messages — edit this list to change the news ===== */
 const NEWS = [
   "Backup ACR code picker if this site fails: paperacr.COM",
+  "Added option to keep your queue on refresh — in 'Other Tools'",
+  "Added 'Recent' to help with your frequent codes",
   "Day / night mode selector added in 'Other Tools'",
   "Cats might be sweet, but their tongues can't taste sweetness!",
   "If you have any urgent paper issues, call the hotline at <span style='color:blue; font-weight:bold;'>613‑580‑3355</span>",
@@ -440,8 +444,49 @@ const list=document.getElementById('list'), input=document.getElementById('q'),
 let filter='all';
 let renderedItems=[];
 
+/* ---- haptics ---- */
+function haptic(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms||10); }catch(e){} }
+
+/* ---- Recent: recency-frequency model (localStorage 'acr-recents') ---- */
+function loadRecents(){
+  try{
+    const raw=localStorage.getItem('acr-recents');
+    if(!raw) return {};
+    const obj=JSON.parse(raw);
+    if(Array.isArray(obj)){ const o={}, now=Date.now(); obj.forEach((c,i)=>{o[c]={count:1,last:now-i*1000};}); return o; }
+    return (obj && typeof obj==='object') ? obj : {};
+  }catch(e){ return {}; }
+}
+let recents=loadRecents();
+function saveRecents(){ try{ localStorage.setItem('acr-recents', JSON.stringify(recents)); }catch(e){} }
+function bumpRecent(code){
+  const r=recents[code]||{count:0,last:0};
+  r.count++; r.last=Date.now(); recents[code]=r;
+  const keys=Object.keys(recents);
+  if(keys.length>100){
+    let ok=null, ot=Infinity;
+    keys.forEach(k=>{ if(recents[k].last<ot){ot=recents[k].last;ok=k;} });
+    if(ok) delete recents[ok];
+  }
+  saveRecents();
+}
+function recentCodes(){
+  return Object.keys(recents)
+    .filter(c=>BY_CODE[c])
+    .sort((a,b)=>(recents[b].count*Math.exp(-0.1*((Date.now()-recents[b].last)/86400000)))
+               -(recents[a].count*Math.exp(-0.1*((Date.now()-recents[a].last)/86400000))))
+    .slice(0,25);
+}
+function updateRecentChip(){
+  const chip=document.querySelector('.recent-chip'); if(!chip) return;
+  const has=recentCodes().length>0;
+  chip.hidden=!has;
+  if(!has && filter==='recent'){ filter='all'; applyChips(); render(); }
+}
+
 const norm=s=>s.toLowerCase().replace(/[–—]/g,'-');
 const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const escAttr=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 function score(item,q){
   const t=norm(item.t), code=norm(item.c).replace(/[^0-9a-z.]/g,''), qc=q.replace(/[^0-9a-z.]/g,'');
@@ -472,20 +517,27 @@ function render(){
   clearBtn.style.display=raw?'block':'none';
   let items = q ? DATA.slice()
             : filter==='common' ? DATA.filter(d=>d.common)
+            : filter==='recent' ? recentCodes().map(c=>BY_CODE[c])
             : DATA.slice();
   if(q){
     items=items.map(d=>({d,s:score(d,q)})).filter(x=>x.s>0)
                .sort((a,b)=>b.s-a.s || a.d.t.localeCompare(b.d.t)).map(x=>x.d);
   }else if(filter==='common'){
     items.sort((a,b)=>(a.ord-b.ord) || a.cat.localeCompare(b.cat) || a.t.localeCompare(b.t));
+  }else if(filter==='recent'){
+    /* keep recency-frequency order */
   }else{
     items.sort((a,b)=>a.cat.localeCompare(b.cat)||a.t.localeCompare(b.t));
   }
   countEl.textContent=items.length+(items.length===1?' code':' codes');
   if(!items.length){
-    list.innerHTML=`<div class="empty"><h2>No matches for "${esc(raw)}"</h2>
+    if(filter==='recent' && !q){
+      list.innerHTML='<div class="empty"><h2>No recent codes yet</h2><p>Codes you add to your list will show up here.</p></div>';
+    }else{
+      list.innerHTML=`<div class="empty"><h2>No matches for "${esc(raw)}"</h2>
       <p>Try a shorter word, a synonym, or the code number.</p>
       <div class="examples">${['fentanyl','stroke','12-lead','oxygen','PPE','seizure','IV'].map(e=>`<button class="ex">${e}</button>`).join('')}</div></div>`;
+    }
     return;
   }
   const cap=q?300:items.length;
@@ -493,7 +545,7 @@ function render(){
   list.innerHTML=renderedItems.map((d,i)=>{
     const badge=d.src==='local'?'<span class="badge b-local">Local</span>':'';
     const star=d.common?'<span class="star" title="Common — every call">★</span>':'';
-    return `<div class="row ${d.common?'is-common':''}" data-ri="${i}">
+    return `<div class="row ${d.common?'is-common':''}" data-ri="${i}" tabindex="0" role="button" aria-label="Add ${escAttr(d.c+': '+d.t)}">
       <span class="code">${esc(d.c)}</span>
       <span class="meta"><div class="title">${star}${highlight(d.t,q)}</div><div class="cat">${esc(d.cat)}</div></span>
       <span class="right">${badge}<span class="plus">+</span></span></div>`;
@@ -512,6 +564,11 @@ list.addEventListener('click',e=>{
   if(e.target.classList.contains('ex')){input.value=e.target.textContent;input.focus();render();return;}
   const row=e.target.closest('.row');
   if(row && row.dataset.ri!==undefined) addItem(renderedItems[+row.dataset.ri], row);
+});
+list.addEventListener('keydown',e=>{
+  if(e.key!=='Enter' && e.key!==' ' && e.key!=='Spacebar') return;
+  const row=e.target.closest('.row');
+  if(row && row.dataset.ri!==undefined){ e.preventDefault(); addItem(renderedItems[+row.dataset.ri], row); }
 });
 
 // modals
@@ -619,7 +676,8 @@ function openOtherTools(){
     {t:"Sample forms", sub:"Completed ACR examples", href:"sample_forms.html"},
     {t:"Submit a question", sub:"External link to MS Forms", href:"https://forms.cloud.microsoft/r/gssS0sBkaZ", ext:true},
     {t:"Day / night mode", sub:(isDark()?"Switch to light":"Switch to dark"), act:"theme"},
-    null,null
+    {t:"Keep my queue", sub:(keepQueue()?"On — saved on this device":"Off — not saved"), act:"keepqueue"},
+    null
   ];
   const body=`<div class="toolgrid">`+opts.map(o=>{
     if(!o) return `<button class="toolopt is-empty" disabled aria-label="Reserved for a future tool"></button>`;
@@ -638,6 +696,7 @@ document.getElementById('modalBack').addEventListener('click',()=>{const mb=docu
 modalBody.addEventListener('click',e=>{const b=e.target.closest('[data-act]'); if(!b) return;
   if(b.dataset.act==='abbrev') openAbbrev();
   else if(b.dataset.act==='theme'){ toggleTheme(); openOtherTools(); }
+  else if(b.dataset.act==='keepqueue'){ toggleKeepQueue(); openOtherTools(); }
 });
 overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
@@ -651,6 +710,25 @@ const dock=document.getElementById('dock'), dockCount=document.getElementById('d
       toast=document.getElementById('toast'), toastMsg=document.getElementById('toastMsg'),
       toastUndo=document.getElementById('toastUndo');
 
+/* ---- queue persistence (localStorage 'acr-queue', toggle 'acr-keepqueue') ---- */
+function keepQueue(){ try{ return localStorage.getItem('acr-keepqueue')!=='false'; }catch(e){ return true; } }
+function saveQueue(){
+  if(!keepQueue()){ try{localStorage.removeItem('acr-queue');}catch(e){} return; }
+  try{ localStorage.setItem('acr-queue', JSON.stringify(selected)); }catch(e){}
+}
+function loadQueue(){
+  if(!keepQueue()) return;
+  try{
+    const arr=JSON.parse(localStorage.getItem('acr-queue')||'[]');
+    if(Array.isArray(arr)) selected=arr.filter(x=>x&&x.c).map(x=>({c:x.c,t:x.t}));
+  }catch(e){}
+}
+function toggleKeepQueue(){
+  const next=!keepQueue();
+  try{ localStorage.setItem('acr-keepqueue', next?'true':'false'); }catch(e){}
+  if(next) saveQueue(); else { try{localStorage.removeItem('acr-queue');}catch(e){} }
+}
+
 function syncDock(){
   const n=selected.length;
   dock.hidden=n===0;
@@ -662,21 +740,22 @@ function bump(){dockCount.classList.add('bump');setTimeout(()=>dockCount.classLi
 function addItem(d,rowEl){
   if(!d) return;
   selected.push({c:d.c,t:d.t});
-  syncDock(); bump();
+  bumpRecent(d.c); updateRecentChip();
+  saveQueue(); syncDock(); bump(); haptic();
   if(rowEl){rowEl.classList.add('flash');setTimeout(()=>rowEl.classList.remove('flash'),230);}
   showToast('Added '+d.c+' — '+d.t);
   if(!queueView.hidden) renderQueue();
 }
-function removeAt(i){selected.splice(i,1);syncDock();renderQueue();}
-function dup(i){selected.splice(i+1,0,selected[i]);syncDock();renderQueue();}
+function removeAt(i){selected.splice(i,1);saveQueue();syncDock();renderQueue();haptic();}
+function dup(i){selected.splice(i+1,0,selected[i]);saveQueue();syncDock();renderQueue();haptic();}
 function move(i,dir){const j=i+dir;if(j<0||j>=selected.length)return;
-  [selected[i],selected[j]]=[selected[j],selected[i]];renderQueue();}
+  [selected[i],selected[j]]=[selected[j],selected[i]];saveQueue();renderQueue();}
 function clearAll(){
   if(!selected.length)return;
-  lastCleared=selected.slice(); selected=[]; syncDock(); renderQueue();
+  lastCleared=selected.slice(); selected=[]; saveQueue(); syncDock(); renderQueue(); haptic(18);
   showToast('List cleared', true);
 }
-function undoClear(){if(lastCleared){selected=lastCleared.slice();lastCleared=null;syncDock();renderQueue();hideToast();}}
+function undoClear(){if(lastCleared){selected=lastCleared.slice();lastCleared=null;saveQueue();syncDock();renderQueue();hideToast();}}
 
 function showToast(msg,undo){
   toastMsg.textContent=msg; toastUndo.hidden=!undo; toast.hidden=false;
@@ -704,8 +783,13 @@ function renderQueue(){
         <button class="qbtn del" data-act="del" data-i="${i}" aria-label="Remove">&times;</button>
       </span></div>`).join('');
 }
-function openQueue(){renderQueue();queueView.hidden=false;}
-function closeQueue(){queueView.hidden=true;}
+function withTransition(fn){
+  if(document.startViewTransition && !matchMedia('(prefers-reduced-motion:reduce)').matches){
+    document.startViewTransition(fn);
+  } else fn();
+}
+function openQueue(){renderQueue();withTransition(()=>{queueView.hidden=false;});}
+function closeQueue(){withTransition(()=>{queueView.hidden=true;});}
 
 queueList.addEventListener('click',e=>{
   const b=e.target.closest('.qbtn'); if(!b)return;
@@ -751,7 +835,7 @@ queueList.addEventListener('click',e=>{
     if(dragRow){
       dragRow.classList.remove('lift');
       const next=rows().map(r=>selected[+r.dataset.i]);
-      dragRow=null; selected=next; renderQueue();
+      dragRow=null; selected=next; saveQueue(); renderQueue(); haptic();
     }
     pendRow=null; pendHandle=null; capId=null;
   }
@@ -816,12 +900,13 @@ function loadFromHash(){
   if(!m) return;
   const codes=decodeURIComponent(m[1]).split(',').map(s=>s.trim()).filter(Boolean);
   const add=codes.map(c=>BY_CODE[c]).filter(Boolean);
-  if(add.length){ selected=add.slice(); syncDock(); openQueue(); }
+  if(add.length){ selected=add.slice(); saveQueue(); syncDock(); openQueue(); }
   history.replaceState(null,'',location.pathname);
 }
 document.getElementById('copyListBtn').addEventListener('click',copyList);
 document.getElementById('shareListBtn').addEventListener('click',shareList);
 if(navigator.share) document.getElementById('shareListBtn').hidden=false;
+loadQueue(); syncDock(); updateRecentChip();
 loadFromHash();
 
 /* ---- FAQ "updated" label + fresh flash (within 7 days) ---- */
