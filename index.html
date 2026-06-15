@@ -112,6 +112,13 @@
   .chip.common-chip[aria-pressed="true"]{background:var(--common);border-color:var(--common)}
   .chip.recent-chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
   .count{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .tsize{display:flex;align-items:center;gap:5px;margin-left:14px}
+  .ts-btn{min-width:34px;height:30px;padding:0 8px;border:1px solid var(--line);background:transparent;
+    border-radius:8px;cursor:pointer;font-weight:700;color:var(--ink);font-size:15px;line-height:1;
+    display:flex;align-items:center;justify-content:center}
+  .ts-btn:hover{border-color:var(--accent);color:var(--accent-ink)}
+  .ts-btn:disabled{opacity:.4;cursor:default;border-color:var(--line);color:var(--ink)}
+  .ts-val{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);min-width:42px;text-align:center}
 
   /* results */
   #list{margin-top:14px;display:flex;flex-direction:column;gap:8px}
@@ -356,6 +363,11 @@
       <button class="chip common-chip" data-f="common" aria-pressed="false">★ Common</button>
       <button class="chip recent-chip" data-f="recent" aria-pressed="false" hidden>Recent</button>
       <span class="count" id="count" aria-live="polite"></span>
+      <div class="tsize" role="group" aria-label="Text size">
+        <button class="ts-btn" id="tsDown" type="button" aria-label="Decrease text size">A&minus;</button>
+        <span class="ts-val" id="tsVal" aria-live="polite">100%</span>
+        <button class="ts-btn" id="tsUp" type="button" aria-label="Increase text size">A+</button>
+      </div>
     </div>
   </div>
 
@@ -425,6 +437,7 @@ const DATA = [{"c": "00", "t": "At Base", "cat": "Status Codes", "src": "form", 
 const NEWS = [
   "Backup ACR code picker if this site fails: paperacr.COM",
   "Added option to keep your List on refresh — in 'Other Tools'",
+  "in response to feedback: Added font size increaser button (unofficial title)",
   "Added 'Recent' to help with your frequent codes",
   "If you have any urgent paper issues, call the hotline at <span style='color:blue; font-weight:bold;'>613‑580‑3355</span>",
   "Feedback and feature requests: <a href=\"mailto:David.Hodges@Ottawa.ca\">David.Hodges@Ottawa.ca</a>",
@@ -433,7 +446,7 @@ const NEWS = [
   "For code 72s w/ NO signatures. Please write 'CNO' in the signature box- don't leave it blank",
   "CNO =/= Strikethrough: CNO if you can't get info. Strikethrough if not relevant for form",
 ];
-const NEWS_ROTATE_MS = 5000;
+const NEWS_ROTATE_MS = 7000;
 /* ============================================================== */
 const HOSPITALS = [{"c": "1661", "t": "Hôpital Montfort (Ottawa)"}, {"c": "1681", "t": "Queensway-Carleton Hospital (QCH, Ottawa)"}, {"c": "1657", "t": "Children's Hospital of Eastern Ontario (CHEO, Ottawa)"}, {"c": "4048", "t": "Ottawa Hospital – General Site"}, {"c": "4046", "t": "Ottawa Hospital – Civic Site"}, {"c": "4164", "t": "University of Ottawa Heart Institute"}, {"c": "40260", "t": "Target Engagement and Diversion (TED) Program"}, {"c": "1885", "t": "Winchester District Memorial Hospital"}, {"c": "1284", "t": "Kemptville District Hospital"}, {"c": "1256", "t": "Carleton Place & District Memorial Hospital"}, {"c": "1799", "t": "Arnprior Regional Health"}, {"c": "1870", "t": "Glengarry Memorial Hospital (Alexandria)"}, {"c": "1254", "t": "Almonte General Hospital"}, {"c": "3991", "t": "Quinte Health – Bancroft"}, {"c": "1801", "t": "St Francis Memorial Hospital (Barry's Bay)"}, {"c": "3988", "t": "Quinte Health – Belleville"}, {"c": "1273", "t": "Brockville General Hospital"}, {"c": "1597", "t": "Campbellford Memorial Hospital"}, {"c": "4008", "t": "Lakeridge Health – Bowmanville (Clarington)"}, {"c": "3860", "t": "Northumberland Hills Hospital (Cobourg)"}, {"c": "4451", "t": "Cornwall Community Hospital"}, {"c": "1803", "t": "Deep River & District Health"}, {"c": "3737", "t": "Haliburton Highlands Health Services"}, {"c": "1777", "t": "Hawkesbury & District General Hospital"}, {"c": "4830", "t": "Kingston Health Sciences Centre – Hotel Dieu"}, {"c": "4831", "t": "Kingston Health Sciences Centre – Kingston General (KGH)"}, {"c": "1893", "t": "Ross Memorial Hospital (Lindsay)"}, {"c": "1295", "t": "Lennox & Addington County General Hospital (Napanee)"}, {"c": "3932", "t": "Lakeridge Health – Oshawa"}, {"c": "1804", "t": "Pembroke Regional Hospital"}, {"c": "3732", "t": "Perth & Smiths Falls District – Perth Site"}, {"c": "1768", "t": "Peterborough Regional Health Centre"}, {"c": "3992", "t": "Quinte Health – Picton"}, {"c": "1813", "t": "Renfrew Victoria Hospital"}, {"c": "4005", "t": "Lakeridge Health – Port Perry (Scugog)"}, {"c": "1269", "t": "Perth & Smiths Falls District – Smiths Falls Site"}, {"c": "1193", "t": "Canadian Forces Hospital (Trenton)"}, {"c": "3994", "t": "Quinte Health – Trenton"}];
 const BADGE = {form:['On form','b-form'], web:["Add'l",'b-add'], local:['Local','b-local']};
@@ -904,6 +917,25 @@ function loadFromHash(){
 document.getElementById('copyListBtn').addEventListener('click',copyList);
 document.getElementById('shareListBtn').addEventListener('click',shareList);
 if(navigator.share) document.getElementById('shareListBtn').hidden=false;
+/* ---- text size (low-vision zoom) ---- */
+const TS_STEPS=[1,1.15,1.3,1.5];
+let tScale=(function(){ try{ const v=parseFloat(localStorage.getItem('acr-textscale')); return TS_STEPS.includes(v)?v:1; }catch(e){ return 1; } })();
+function applyTS(){
+  document.body.style.zoom=String(tScale);
+  const v=document.getElementById('tsVal'); if(v) v.textContent=Math.round(tScale*100)+'%';
+  const dn=document.getElementById('tsDown'), up=document.getElementById('tsUp');
+  if(dn) dn.disabled=tScale<=TS_STEPS[0];
+  if(up) up.disabled=tScale>=TS_STEPS[TS_STEPS.length-1];
+  try{ localStorage.setItem('acr-textscale', String(tScale)); }catch(e){}
+}
+function stepTS(dir){
+  const i=Math.max(0,TS_STEPS.indexOf(tScale)), j=Math.min(TS_STEPS.length-1,Math.max(0,i+dir));
+  tScale=TS_STEPS[j]; applyTS(); haptic();
+}
+document.getElementById('tsDown').addEventListener('click',()=>stepTS(-1));
+document.getElementById('tsUp').addEventListener('click',()=>stepTS(1));
+applyTS();
+
 loadQueue(); syncDock(); updateRecentChip();
 loadFromHash();
 
