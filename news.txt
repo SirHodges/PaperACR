@@ -4,7 +4,7 @@
 # Top line shows first, then it cycles down the list. See the AI guide for details.
 
 Backup ACR code picker if this site fails: paperacr.COM
-Added option to keep your List on refresh — in 'Other Tools'
+Added default to keep list on refresh — Disable in 'Other Tools'
 in response to feedback: Added font size increaser button (unofficial title)
 Added 'Recent' to help with your frequent codes
 If you have any urgent paper issues, call the hotline at <span style="color:blue; font-weight:bold;">613‑580‑3355</span>
