@@ -1,0 +1,15 @@
+# news.txt — the scrolling banner on paperacr.ca
+# One news item per line. Blank lines are ignored.
+# Lines starting with # are comments (ignored). HTML is allowed.
+# Top line shows first, then it cycles down the list. See the AI guide for details.
+
+Backup ACR code picker if this site fails: paperacr.COM
+Added option to keep your List on refresh — in 'Other Tools'
+in response to feedback: Added font size increaser button (unofficial title)
+Added 'Recent' to help with your frequent codes
+If you have any urgent paper issues, call the hotline at <span style="color:blue; font-weight:bold;">613‑580‑3355</span>
+Feedback and feature requests: <a href="mailto:David.Hodges@Ottawa.ca">David.Hodges@Ottawa.ca</a>
+The Eiffel Tower can grow over 15 cm taller in summer due to heat expansion.
+For code 71s- In the demographics section, ensure 'CNO' is added to Name, age, DOB, and Healthcard number
+For code 72s w/ NO signatures. Please write 'CNO' in the signature box- don't leave it blank
+CNO =/= Strikethrough: CNO if you can't get info. Strikethrough if not relevant for form
