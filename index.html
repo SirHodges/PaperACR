@@ -807,8 +807,27 @@ function withTransition(fn){
     document.startViewTransition(fn);
   } else fn();
 }
-function openQueue(){renderQueue();withTransition(()=>{queueView.hidden=false;});}
-function closeQueue(){withTransition(()=>{queueView.hidden=true;});}
+
+/* ---- keep the screen awake while the list is open (Wake Lock API) ---- */
+let wakeLock=null;
+async function requestWake(){
+  try{
+    if('wakeLock' in navigator && document.visibilityState==='visible'){
+      wakeLock=await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release',()=>{ wakeLock=null; });
+    }
+  }catch(e){ wakeLock=null; }
+}
+async function releaseWake(){
+  try{ if(wakeLock) await wakeLock.release(); }catch(e){}
+  wakeLock=null;
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible' && queueView && !queueView.hidden && !wakeLock) requestWake();
+});
+
+function openQueue(){renderQueue();withTransition(()=>{queueView.hidden=false;}); requestWake();}
+function closeQueue(){withTransition(()=>{queueView.hidden=true;}); releaseWake();}
 
 queueList.addEventListener('click',e=>{
   const b=e.target.closest('.qbtn'); if(!b)return;
