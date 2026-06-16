@@ -3,9 +3,9 @@
 # Lines starting with # are comments (ignored). HTML is allowed.
 # Top line shows first, then it cycles down the list. See the AI guide for details.
 
-Backup ACR code picker if this site fails: paperacr.COM
+Backup ACR code picker if this site fails: PaperACR.COM
 Added default to keep list on refresh — Disable in 'Other Tools'
-in response to feedback: Added font size increaser button (unofficial title)
+In response to feedback: Added font size increaser button (unofficial title)
 Added 'Recent' to help with your frequent codes
 Added A-Z, 1-3 and recommended sort (At anon request!)
 Screenshould stay on (new devices) viewing List (Another Request!)
