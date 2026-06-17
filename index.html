@@ -72,7 +72,7 @@
   @media (prefers-reduced-motion:reduce){.news .msg{transition:none}}
 
   /* toolbar */
-  .toolbar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0 6px}
+  .toolbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0 6px}
   .tbtn{font:600 14px 'Inter',sans-serif;padding:14px 12px;border-radius:12px;cursor:pointer;
     border:1px solid var(--line);background:var(--panel);color:var(--ink);transition:.14s;text-decoration:none;
     display:flex;align-items:center;justify-content:center;gap:8px;min-height:50px}
@@ -319,10 +319,46 @@
     font:600 14px 'Inter';box-shadow:0 12px 30px rgba(0,0,0,.25);max-width:calc(100% - 32px)}
   .toast button{background:transparent;border:0;color:#ffd98a;font:700 14px 'Inter';cursor:pointer;padding:2px 4px}
 
-  @media (max-width:640px){.toolbar{grid-template-columns:repeat(2,1fr)}}
   @media (max-width:560px){.row{gap:10px;padding:10px 12px}
     .code{min-width:46px;font-size:13.5px}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+  /* ---- time feature: anchor row, time pills, editor sheet ---- */
+  .qanchor{display:flex;align-items:center;gap:10px;background:var(--accent-tint,#e7f0ee);
+    border:1px solid var(--accent);border-radius:11px;padding:9px 11px;margin-bottom:10px}
+  .qanchor-pin{color:var(--accent);flex:0 0 auto}
+  .qanchor-lbl{flex:1;min-width:0;font:700 11px/1.2 'JetBrains Mono',monospace;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--accent-ink,#0c5f58)}
+  .qanchor-lbl small{display:block;font:400 11px/1.3 'Inter',sans-serif;letter-spacing:0;text-transform:none;color:var(--muted);margin-top:2px}
+  .qtime{font:700 15px/1 'JetBrains Mono',monospace;letter-spacing:.02em;border-radius:8px;padding:8px 9px;
+    cursor:pointer;white-space:nowrap;flex:0 0 auto;border:1px solid transparent}
+  .qanchor .qtime{background:#fff;color:var(--accent-ink,#0c5f58);border-color:var(--accent)}
+  .qline .qtime{background:var(--field);color:var(--ink)}
+  .qtime.unset{font-weight:600;color:var(--muted)}
+  :root.dark .qanchor{background:#16241f}
+  :root.dark .qanchor .qtime{background:#0e1814}
+  /* editor sheet */
+  .tedit-scrim{position:fixed;inset:0;background:rgba(10,20,16,.34);z-index:60;opacity:0;transition:opacity .18s}
+  .tedit-scrim.on{opacity:1}
+  .tedit{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--card,#fff);
+    border-radius:18px 18px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.2);
+    padding:18px 18px calc(18px + env(safe-area-inset-bottom));max-width:620px;margin:0 auto;
+    transform:translateY(110%);transition:transform .22s}
+  .tedit.on{transform:translateY(0)}
+  .tedit-h{font:700 12px/1 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);text-align:center;margin:0 0 14px}
+  .tedit-steps{display:flex;align-items:center;justify-content:center;gap:10px}
+  .tedit-col{display:flex;flex-direction:column;align-items:center;gap:7px}
+  .tedit-col button{width:74px;height:46px;border:1px solid var(--line);background:transparent;border-radius:11px;
+    font-size:24px;font-weight:700;color:var(--accent);cursor:pointer;line-height:1}
+  .tedit-col button:active{background:var(--field)}
+  .tedit-val{font:700 40px/1 'JetBrains Mono',monospace;width:74px;text-align:center;padding:6px 0;color:var(--ink)}
+  .tedit-lbl{font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .tedit-colon{font:700 32px/1 'JetBrains Mono',monospace;color:var(--muted);padding-bottom:30px}
+  .tedit-acts{display:flex;gap:9px;margin-top:18px}
+  .tedit-acts button{flex:1;border:1px solid var(--line);background:transparent;border-radius:10px;
+    padding:12px 8px;font:600 14px/1 'Inter',sans-serif;color:var(--ink);cursor:pointer}
+  .tedit-acts .revert{color:var(--accent-ink,#0c5f58)}
+  .tedit-acts .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
 </style>
 <script>(function(){try{var t=localStorage.getItem('acr-theme');if(!t)t=(window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches)?'dark':'light';if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();</script>
 </head>
@@ -356,7 +392,11 @@
     </button>
     <button class="tbtn primary" id="otherToolsBtn">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h4l2-2h6l2 2h4v12H3z"/><circle cx="12" cy="13" r="3"/></svg>
-      Other Tools
+      Other resources
+    </button>
+    <button class="tbtn primary" id="settingsBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
     </button>
   </div>
 
@@ -440,6 +480,31 @@
       <button class="x" id="closeModal" aria-label="Close">&times;</button>
     </div>
     <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="tedit-scrim" id="teditScrim" hidden></div>
+<div class="tedit" id="tedit" role="dialog" aria-label="Set time" hidden>
+  <p class="tedit-h" id="teditTitle">Set time</p>
+  <div class="tedit-steps">
+    <div class="tedit-col">
+      <button type="button" data-ts="h" data-tv="1" aria-label="Hour up">&plus;</button>
+      <div class="tedit-val" id="teditH">07</div>
+      <button type="button" data-ts="h" data-tv="-1" aria-label="Hour down">&minus;</button>
+      <span class="tedit-lbl">hr</span>
+    </div>
+    <span class="tedit-colon">:</span>
+    <div class="tedit-col">
+      <button type="button" data-ts="m" data-tv="1" aria-label="Minute up">&plus;</button>
+      <div class="tedit-val" id="teditM">34</div>
+      <button type="button" data-ts="m" data-tv="-1" aria-label="Minute down">&minus;</button>
+      <span class="tedit-lbl">min</span>
+    </div>
+  </div>
+  <div class="tedit-acts">
+    <button type="button" id="teditRevert" class="revert">Patient contact</button>
+    <button type="button" id="teditClear">Clear</button>
+    <button type="button" id="teditDone" class="primary">Done</button>
   </div>
 </div>
 
@@ -694,34 +759,54 @@ function openOtherTools(){
     {t:"Ministry Approved abbreviations", act:"abbrev"},
     {t:"Sample forms", sub:"Completed ACR examples", href:"sample_forms.html"},
     {t:"Submit a question", sub:"External link to MS Forms", href:"https://forms.cloud.microsoft/r/gssS0sBkaZ", ext:true},
-    {t:"Day / night mode", sub:(isDark()?"Switch to light":"Switch to dark"), act:"theme"},
-    {t:"Keep my queue", sub:(keepQueue()?"On — saved on this device":"Off — not saved"), act:"keepqueue"},
     null
   ];
-  const body=`<div class="toolgrid">`+opts.map(o=>{
-    if(!o) return `<button class="toolopt is-empty" disabled aria-label="Reserved for a future tool"></button>`;
+  showModal('Other resources', toolGrid(opts));
+}
+function openSettings(){
+  const opts=[
+    {t:"Day / night mode", sub:(isDark()?"Switch to light":"Switch to dark"), act:"theme"},
+    {t:"Save my queue", sub:(keepQueue()?"On — saved on this device":"Off — not saved"), act:"keepqueue"},
+    {t:"Show times", sub:(showTimes()?"On — Patient contact + code times":"Off"), act:"showtimes"},
+    null
+  ];
+  showModal('Settings', toolGrid(opts));
+}
+function toolGrid(opts){
+  return `<div class="toolgrid">`+opts.map(o=>{
+    if(!o) return `<button class="toolopt is-empty" disabled aria-label="Reserved for a future option"></button>`;
     const inner=`<span class="toolopt-t">${esc(o.t)}</span>`+(o.sub?`<span class="toolopt-sub">${esc(o.sub)}</span>`:'');
     return o.href
       ? `<a class="toolopt" href="${o.href}"${o.ext?' target="_blank" rel="noopener"':''}>${inner}</a>`
       : `<button class="toolopt" data-act="${o.act}">${inner}</button>`;
   }).join('')+`</div>`;
-  showModal('Other tools', body);
 }
 
 document.getElementById('otherToolsBtn').addEventListener('click',openOtherTools);
+document.getElementById('settingsBtn').addEventListener('click',openSettings);
 document.getElementById('quickrefBtn').addEventListener('click',openQuickref);
 document.getElementById('closeModal').addEventListener('click',closeModal);
 document.getElementById('modalBack').addEventListener('click',()=>{const mb=document.getElementById('modalBack'); if(mb._fn) mb._fn();});
 modalBody.addEventListener('click',e=>{const b=e.target.closest('[data-act]'); if(!b) return;
   if(b.dataset.act==='abbrev') openAbbrev();
-  else if(b.dataset.act==='theme'){ toggleTheme(); openOtherTools(); }
-  else if(b.dataset.act==='keepqueue'){ toggleKeepQueue(); openOtherTools(); }
+  else if(b.dataset.act==='theme'){ toggleTheme(); openSettings(); }
+  else if(b.dataset.act==='keepqueue'){ toggleKeepQueue(); openSettings(); }
+  else if(b.dataset.act==='showtimes'){ toggleShowTimes(); openSettings(); }
 });
 overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
 /* ---- selection queue ---- */
 let selected=[], lastCleared=null, toastTimer=null;
+let anchor=null; /* "HH:MM" patient-contact anchor (only used when Show times is on) */
+const DASH='--\u200a:\u200a--';
+const padT=n=>String(n).padStart(2,'0');
+const nowHM=()=>{const d=new Date();return padT(d.getHours())+':'+padT(d.getMinutes());};
+function showTimes(){ try{ return localStorage.getItem('acr-showtimes')==='true'; }catch(e){ return false; } } /* default OFF */
+function toggleShowTimes(){
+  try{ localStorage.setItem('acr-showtimes', showTimes()?'false':'true'); }catch(e){}
+  if(!queueView.hidden) renderQueue();
+}
 const GRIP='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="5" r="1.55"/><circle cx="15" cy="5" r="1.55"/><circle cx="9" cy="12" r="1.55"/><circle cx="15" cy="12" r="1.55"/><circle cx="9" cy="19" r="1.55"/><circle cx="15" cy="19" r="1.55"/></svg>';
 const dock=document.getElementById('dock'), dockCount=document.getElementById('dockCount'),
       queueView=document.getElementById('queueView'), queueList=document.getElementById('queueList'),
@@ -732,20 +817,24 @@ const dock=document.getElementById('dock'), dockCount=document.getElementById('d
 /* ---- queue persistence (localStorage 'acr-queue', toggle 'acr-keepqueue') ---- */
 function keepQueue(){ try{ return localStorage.getItem('acr-keepqueue')!=='false'; }catch(e){ return true; } }
 function saveQueue(){
-  if(!keepQueue()){ try{localStorage.removeItem('acr-queue');}catch(e){} return; }
-  try{ localStorage.setItem('acr-queue', JSON.stringify(selected)); }catch(e){}
+  if(!keepQueue()){ try{localStorage.removeItem('acr-queue');localStorage.removeItem('acr-anchor');}catch(e){} return; }
+  try{
+    localStorage.setItem('acr-queue', JSON.stringify(selected));
+    if(anchor) localStorage.setItem('acr-anchor', anchor); else localStorage.removeItem('acr-anchor');
+  }catch(e){}
 }
 function loadQueue(){
   if(!keepQueue()) return;
   try{
     const arr=JSON.parse(localStorage.getItem('acr-queue')||'[]');
-    if(Array.isArray(arr)) selected=arr.filter(x=>x&&x.c).map(x=>({c:x.c,t:x.t}));
+    if(Array.isArray(arr)) selected=arr.filter(x=>x&&x.c).map(x=>({c:x.c,t:x.t,time:x.time||null}));
+    anchor=localStorage.getItem('acr-anchor')||null;
   }catch(e){}
 }
 function toggleKeepQueue(){
   const next=!keepQueue();
   try{ localStorage.setItem('acr-keepqueue', next?'true':'false'); }catch(e){}
-  if(next) saveQueue(); else { try{localStorage.removeItem('acr-queue');}catch(e){} }
+  if(next) saveQueue(); else { try{localStorage.removeItem('acr-queue');localStorage.removeItem('acr-anchor');}catch(e){} }
 }
 
 function syncDock(){
@@ -758,7 +847,7 @@ function syncDock(){
 function bump(){dockCount.classList.add('bump');setTimeout(()=>dockCount.classList.remove('bump'),170);}
 function addItem(d,rowEl){
   if(!d) return;
-  selected.push({c:d.c,t:d.t});
+  selected.push({c:d.c,t:d.t,time:null});
   bumpRecent(d.c); updateRecentChip();
   saveQueue(); syncDock(); bump(); haptic();
   if(rowEl){rowEl.classList.add('flash');setTimeout(()=>rowEl.classList.remove('flash'),230);}
@@ -782,17 +871,31 @@ function showToast(msg,undo){
 }
 function hideToast(){toast.hidden=true;}
 
+function anchorRowHTML(){
+  const set=!!anchor;
+  return `<div class="qanchor" data-anchor="1">
+    <svg class="qanchor-pin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+    <span class="qanchor-lbl">Patient contact<small>anchor for code times · tap to set</small></span>
+    <span class="qtime pill ${set?'':'unset'}" data-kind="anchor">${set?anchor:DASH}</span>
+  </div>`;
+}
+function timePill(time,i){
+  return `<span class="qtime pill ${time?'':'unset'}" data-kind="code" data-i="${i}" aria-label="Set time">${time||DASH}</span>`;
+}
 function renderQueue(){
   const cb=document.getElementById('copyListBtn'), sb=document.getElementById('shareListBtn');
   if(cb) cb.disabled=!selected.length; if(sb) sb.disabled=!selected.length;
   queueTitle.textContent='Your codes ('+selected.length+')';
+  const times=showTimes();
   if(!selected.length){
-    queueList.innerHTML='<div class="sheet-empty"><b>No codes selected yet</b>Tap any result to add it here, in order.</div>';
+    queueList.innerHTML=(times?anchorRowHTML():'')+'<div class="sheet-empty"><b>No codes selected yet</b>Tap any result to add it here, in order.</div>';
     return;
   }
-  queueList.innerHTML='<div class="qhint">'+GRIP+'Hold and drag the left edge to reorder</div>'+
+  queueList.innerHTML=(times?anchorRowHTML():'')+
+    '<div class="qhint">'+GRIP+'Hold and drag the left edge to reorder</div>'+
     selected.map((d,i)=>`<div class="qline" data-i="${i}">
       <span class="qhandle" aria-label="Drag to reorder">${GRIP}<span class="qnum">${i+1}</span></span>
+      ${times?timePill(d.time,i):''}
       <span class="qcode">${esc(d.c)}</span>
       <span class="qdesc">${esc(d.t)}</span>
       <span class="qctrl">
@@ -829,7 +932,47 @@ document.addEventListener('visibilitychange',()=>{
 function openQueue(){renderQueue();withTransition(()=>{queueView.hidden=false;}); requestWake();}
 function closeQueue(){withTransition(()=>{queueView.hidden=true;}); releaseWake();}
 
+/* ---- time editor (bottom sheet of steppers) ---- */
+const tedit=document.getElementById('tedit'), teditScrim=document.getElementById('teditScrim'),
+      teditH=document.getElementById('teditH'), teditM=document.getElementById('teditM'),
+      teditTitle=document.getElementById('teditTitle'), teditRevert=document.getElementById('teditRevert');
+let tEditing=null, tH=7, tM=34;
+function drawTedit(){ teditH.textContent=padT(tH); teditM.textContent=padT(tM); }
+function openTedit(target){
+  tEditing=target;
+  let seed;
+  if(target.kind==='anchor'){ seed=anchor||nowHM(); teditTitle.textContent='Patient contact'; teditRevert.hidden=true; }
+  else { const d=selected[target.i]; seed=d.time||anchor||nowHM(); teditTitle.textContent=d.c+' \u00B7 time'; teditRevert.hidden=!anchor; }
+  tH=+seed.slice(0,2); tM=+seed.slice(3,5); drawTedit();
+  teditScrim.hidden=false; tedit.hidden=false;
+  requestAnimationFrame(()=>{ teditScrim.classList.add('on'); tedit.classList.add('on'); });
+}
+function closeTedit(){ tedit.classList.remove('on'); teditScrim.classList.remove('on');
+  setTimeout(()=>{ tedit.hidden=true; teditScrim.hidden=true; },200); tEditing=null; }
+function commitTedit(val){
+  if(!tEditing) return;
+  if(tEditing.kind==='anchor') anchor=val;
+  else if(selected[tEditing.i]) selected[tEditing.i].time=val;
+  saveQueue(); renderQueue();
+}
+tedit.querySelectorAll('[data-ts]').forEach(b=>b.addEventListener('click',()=>{
+  const v=+b.dataset.tv;
+  if(b.dataset.ts==='h') tH=(tH+v+24)%24; else tM=(tM+v+60)%60;
+  drawTedit(); haptic(8);
+}));
+document.getElementById('teditDone').addEventListener('click',()=>{ commitTedit(padT(tH)+':'+padT(tM)); closeTedit(); haptic(); });
+document.getElementById('teditClear').addEventListener('click',()=>{ commitTedit(null); closeTedit(); haptic(); });
+teditRevert.addEventListener('click',()=>{ if(anchor){ tH=+anchor.slice(0,2); tM=+anchor.slice(3,5); drawTedit(); haptic(8); } });
+teditScrim.addEventListener('click',closeTedit);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !tedit.hidden) closeTedit(); });
+
 queueList.addEventListener('click',e=>{
+  const pill=e.target.closest('.qtime');
+  if(pill){
+    if(pill.dataset.kind==='anchor') openTedit({kind:'anchor'});
+    else openTedit({kind:'code', i:+pill.dataset.i});
+    return;
+  }
   const b=e.target.closest('.qbtn'); if(!b)return;
   const i=+b.dataset.i;
   if(b.dataset.act==='up')move(i,-1);
@@ -907,7 +1050,11 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape' && !queueView.hidden
 /* ---- share / copy a call list ---- */
 const BY_CODE={}; DATA.forEach(d=>{ if(!(d.c in BY_CODE)) BY_CODE[d.c]=d; });
 function shareURL(){
-  return location.href.split('#')[0].split('?')[0] + '#list=' + selected.map(d=>d.c).join(',');
+  const base=location.href.split('#')[0].split('?')[0];
+  const items=selected.map(d=> d.time ? d.c+'.'+d.time.replace(':','') : d.c).join(',');
+  let hash='#list='+items;
+  if(anchor) hash+='&pc='+anchor.replace(':','');
+  return base+hash;
 }
 function legacyCopy(text){
   const ta=document.createElement('textarea'); ta.value=text;
@@ -934,10 +1081,19 @@ async function shareList(){
   else { copyList(); }
 }
 function loadFromHash(){
-  const m=(location.hash||'').match(/list=([^&]+)/);
+  const hash=location.hash||'';
+  const m=hash.match(/list=([^&]+)/);
   if(!m) return;
-  const codes=decodeURIComponent(m[1]).split(',').map(s=>s.trim()).filter(Boolean);
-  const add=codes.map(c=>BY_CODE[c]).filter(Boolean);
+  const parts=decodeURIComponent(m[1]).split(',').map(s=>s.trim()).filter(Boolean);
+  const add=[];
+  parts.forEach(p=>{
+    const [code,t]=p.split('.');
+    const d=BY_CODE[code]; if(!d) return;
+    const time=(t && /^\d{4}$/.test(t)) ? t.slice(0,2)+':'+t.slice(2) : null;
+    add.push({c:d.c, t:d.t, time});
+  });
+  const pcm=hash.match(/pc=(\d{4})/);
+  if(pcm) anchor=pcm[1].slice(0,2)+':'+pcm[1].slice(2);
   if(add.length){ selected=add.slice(); saveQueue(); syncDock(); openQueue(); }
   history.replaceState(null,'',location.pathname);
 }
