@@ -3,6 +3,7 @@
 # Lines starting with # are comments (ignored). HTML is allowed.
 # Top line shows first, then it cycles down the list. See the AI guide for details.
 
+<span style="color:red; font-weight:bold;">NEW</span> Times option: Turn on in Settings and tell me what you think
 Backup ACR code picker if this site fails: PaperACR.COM
 Added default to keep list on refresh — Disable in 'Other Tools'
 In response to feedback: Added font size increaser button (unofficial title)
