@@ -339,26 +339,36 @@
   /* editor sheet */
   .tedit-scrim{position:fixed;inset:0;background:rgba(10,20,16,.34);z-index:60;opacity:0;transition:opacity .18s}
   .tedit-scrim.on{opacity:1}
-  .tedit{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--card,#fff);
+  .tedit{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--panel);
     border-radius:18px 18px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.2);
     padding:18px 18px calc(18px + env(safe-area-inset-bottom));max-width:620px;margin:0 auto;
     transform:translateY(110%);transition:transform .22s}
   .tedit.on{transform:translateY(0)}
-  .tedit-h{font:700 12px/1 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;
-    color:var(--muted);text-align:center;margin:0 0 14px}
+  .tedit-h{font:700 13px/1 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink);text-align:center;margin:0 0 14px}
   .tedit-steps{display:flex;align-items:center;justify-content:center;gap:10px}
   .tedit-col{display:flex;flex-direction:column;align-items:center;gap:7px}
-  .tedit-col button{width:74px;height:46px;border:1px solid var(--line);background:transparent;border-radius:11px;
-    font-size:24px;font-weight:700;color:var(--accent);cursor:pointer;line-height:1}
-  .tedit-col button:active{background:var(--field)}
+  .tedit-col button{width:74px;height:46px;border:1px solid var(--line);background:var(--field);border-radius:11px;
+    font-size:24px;font-weight:800;color:var(--accent-ink);cursor:pointer;line-height:1}
+  .tedit-col button:active{background:var(--line)}
   .tedit-val{font:700 40px/1 'JetBrains Mono',monospace;width:74px;text-align:center;padding:6px 0;color:var(--ink)}
-  .tedit-lbl{font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-  .tedit-colon{font:700 32px/1 'JetBrains Mono',monospace;color:var(--muted);padding-bottom:30px}
+  .tedit-lbl{font:700 10px/1 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+  .tedit-colon{font:700 32px/1 'JetBrains Mono',monospace;color:var(--ink);padding-bottom:30px}
   .tedit-acts{display:flex;gap:9px;margin-top:18px}
-  .tedit-acts button{flex:1;border:1px solid var(--line);background:transparent;border-radius:10px;
-    padding:12px 8px;font:600 14px/1 'Inter',sans-serif;color:var(--ink);cursor:pointer}
-  .tedit-acts .revert{color:var(--accent-ink,#0c5f58)}
+  .tedit-acts button{flex:1;border:1px solid var(--line);background:var(--field);border-radius:10px;
+    padding:12px 8px;font:700 14px/1 'Inter',sans-serif;color:var(--ink);cursor:pointer}
+  .tedit-acts .revert{color:var(--accent-ink)}
   .tedit-acts .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  /* per-row actions popup */
+  .qmenu-scrim{position:fixed;inset:0;z-index:62}
+  .qmenu{position:fixed;z-index:63;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.2);padding:6px;min-width:178px;display:flex;flex-direction:column;gap:2px}
+  .qmenu button{display:flex;align-items:center;width:100%;text-align:left;border:0;background:transparent;
+    padding:11px 12px;border-radius:8px;font:600 14px/1 'Inter',sans-serif;color:var(--ink);cursor:pointer}
+  .qmenu button:hover{background:var(--field)}
+  .qmenu button[disabled]{opacity:.36;cursor:default}
+  .qmenu button.danger{color:#c0392b}
+  :root.dark .qmenu button.danger{color:#ff8a7a}
 </style>
 <script>(function(){try{var t=localStorage.getItem('acr-theme');if(!t)t=(window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches)?'dark':'light';if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();</script>
 </head>
@@ -506,6 +516,14 @@
     <button type="button" id="teditClear">Clear</button>
     <button type="button" id="teditDone" class="primary">Done</button>
   </div>
+</div>
+
+<div class="qmenu-scrim" id="qmenuScrim" hidden></div>
+<div class="qmenu" id="qmenu" role="menu" hidden>
+  <button type="button" data-m="up" role="menuitem">&uarr;&ensp;Move up</button>
+  <button type="button" data-m="down" role="menuitem">&darr;&ensp;Move down</button>
+  <button type="button" data-m="dup" role="menuitem">&#10697;&ensp;Duplicate</button>
+  <button type="button" data-m="del" class="danger" role="menuitem">&times;&ensp;Delete</button>
 </div>
 
 <script>
@@ -805,6 +823,7 @@ const nowHM=()=>{const d=new Date();return padT(d.getHours())+':'+padT(d.getMinu
 function showTimes(){ try{ return localStorage.getItem('acr-showtimes')==='true'; }catch(e){ return false; } } /* default OFF */
 function toggleShowTimes(){
   try{ localStorage.setItem('acr-showtimes', showTimes()?'false':'true'); }catch(e){}
+  sortSelected(); saveQueue();
   if(!queueView.hidden) renderQueue();
 }
 const GRIP='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="5" r="1.55"/><circle cx="15" cy="5" r="1.55"/><circle cx="9" cy="12" r="1.55"/><circle cx="15" cy="12" r="1.55"/><circle cx="9" cy="19" r="1.55"/><circle cx="15" cy="19" r="1.55"/></svg>';
@@ -829,6 +848,7 @@ function loadQueue(){
     const arr=JSON.parse(localStorage.getItem('acr-queue')||'[]');
     if(Array.isArray(arr)) selected=arr.filter(x=>x&&x.c).map(x=>({c:x.c,t:x.t,time:x.time||null}));
     anchor=localStorage.getItem('acr-anchor')||null;
+    sortSelected();
   }catch(e){}
 }
 function toggleKeepQueue(){
@@ -845,9 +865,20 @@ function syncDock(){
   if(n===0 && !queueView.hidden) renderQueue();
 }
 function bump(){dockCount.classList.add('bump');setTimeout(()=>dockCount.classList.remove('bump'),170);}
+
+/* ---- auto-sort by time (only when Show times is on) ----
+   blanks (no time) ride at the TOP; then ascending HH:MM; stable within equal times. */
+function timeKey(d){ return d.time==null ? -1 : (+d.time.slice(0,2)*60 + +d.time.slice(3,5)); }
+function sortSelected(){
+  if(!showTimes()) return;
+  selected = selected.map((d,i)=>({d,i}))
+    .sort((a,b)=>(timeKey(a.d)-timeKey(b.d))||(a.i-b.i)).map(x=>x.d);
+}
+
 function addItem(d,rowEl){
   if(!d) return;
   selected.push({c:d.c,t:d.t,time:null});
+  sortSelected();
   bumpRecent(d.c); updateRecentChip();
   saveQueue(); syncDock(); bump(); haptic();
   if(rowEl){rowEl.classList.add('flash');setTimeout(()=>rowEl.classList.remove('flash'),230);}
@@ -855,15 +886,19 @@ function addItem(d,rowEl){
   if(!queueView.hidden) renderQueue();
 }
 function removeAt(i){selected.splice(i,1);saveQueue();syncDock();renderQueue();haptic();}
-function dup(i){selected.splice(i+1,0,selected[i]);saveQueue();syncDock();renderQueue();haptic();}
-function move(i,dir){const j=i+dir;if(j<0||j>=selected.length)return;
-  [selected[i],selected[j]]=[selected[j],selected[i]];saveQueue();renderQueue();}
+function dup(i){selected.splice(i+1,0,{...selected[i]});sortSelected();saveQueue();syncDock();renderQueue();haptic();}
+function move(i,dir){
+  const j=i+dir; if(j<0||j>=selected.length) return;
+  if(showTimes()) selected[i].time=selected[j].time;   // adopt the time of where we land
+  [selected[i],selected[j]]=[selected[j],selected[i]];
+  sortSelected(); saveQueue(); renderQueue(); haptic();
+}
 function clearAll(){
   if(!selected.length)return;
   lastCleared=selected.slice(); selected=[]; saveQueue(); syncDock(); renderQueue(); haptic(18);
   showToast('List cleared', true);
 }
-function undoClear(){if(lastCleared){selected=lastCleared.slice();lastCleared=null;saveQueue();syncDock();renderQueue();hideToast();}}
+function undoClear(){if(lastCleared){selected=lastCleared.slice();lastCleared=null;sortSelected();saveQueue();syncDock();renderQueue();hideToast();}}
 
 function showToast(msg,undo){
   toastMsg.textContent=msg; toastUndo.hidden=!undo; toast.hidden=false;
@@ -893,17 +928,23 @@ function renderQueue(){
   }
   queueList.innerHTML=(times?anchorRowHTML():'')+
     '<div class="qhint">'+GRIP+'Hold and drag the left edge to reorder</div>'+
-    selected.map((d,i)=>`<div class="qline" data-i="${i}">
-      <span class="qhandle" aria-label="Drag to reorder">${GRIP}<span class="qnum">${i+1}</span></span>
-      ${times?timePill(d.time,i):''}
-      <span class="qcode">${esc(d.c)}</span>
-      <span class="qdesc">${esc(d.t)}</span>
-      <span class="qctrl">
-        <button class="qbtn arrow" data-act="up" data-i="${i}" ${i===0?'disabled':''} aria-label="Move up">&uarr;</button>
-        <button class="qbtn arrow" data-act="down" data-i="${i}" ${i===selected.length-1?'disabled':''} aria-label="Move down">&darr;</button>
-        <button class="qbtn" data-act="dup" data-i="${i}" aria-label="Duplicate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
-        <button class="qbtn del" data-act="del" data-i="${i}" aria-label="Remove">&times;</button>
-      </span></div>`).join('');
+    selected.map((d,i)=>{
+      const handle = times
+        ? `<span class="qhandle" aria-label="Drag to reorder">${GRIP}</span>`
+        : `<span class="qhandle" aria-label="Drag to reorder">${GRIP}<span class="qnum">${i+1}</span></span>`;
+      const ctrl = times
+        ? `<button class="qbtn qkebab" data-i="${i}" aria-label="Row actions" aria-haspopup="menu"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg></button>`
+        : `<button class="qbtn arrow" data-act="up" data-i="${i}" ${i===0?'disabled':''} aria-label="Move up">&uarr;</button>
+           <button class="qbtn arrow" data-act="down" data-i="${i}" ${i===selected.length-1?'disabled':''} aria-label="Move down">&darr;</button>
+           <button class="qbtn" data-act="dup" data-i="${i}" aria-label="Duplicate"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
+           <button class="qbtn del" data-act="del" data-i="${i}" aria-label="Remove">&times;</button>`;
+      return `<div class="qline" data-i="${i}">
+        ${handle}
+        ${times?timePill(d.time,i):''}
+        <span class="qcode">${esc(d.c)}</span>
+        <span class="qdesc">${esc(d.t)}</span>
+        <span class="qctrl">${ctrl}</span></div>`;
+    }).join('');
 }
 function withTransition(fn){
   if(document.startViewTransition && !matchMedia('(prefers-reduced-motion:reduce)').matches){
@@ -953,7 +994,7 @@ function commitTedit(val){
   if(!tEditing) return;
   if(tEditing.kind==='anchor') anchor=val;
   else if(selected[tEditing.i]) selected[tEditing.i].time=val;
-  saveQueue(); renderQueue();
+  sortSelected(); saveQueue(); renderQueue();
 }
 tedit.querySelectorAll('[data-ts]').forEach(b=>b.addEventListener('click',()=>{
   const v=+b.dataset.tv;
@@ -966,6 +1007,31 @@ teditRevert.addEventListener('click',()=>{ if(anchor){ tH=+anchor.slice(0,2); tM
 teditScrim.addEventListener('click',closeTedit);
 document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !tedit.hidden) closeTedit(); });
 
+/* ---- per-row actions popup (kebab) ---- */
+const qmenu=document.getElementById('qmenu'), qmenuScrim=document.getElementById('qmenuScrim');
+let qmenuI=-1;
+function openQMenu(btn,i){
+  qmenuI=i;
+  qmenu.querySelector('[data-m=up]').disabled = i<=0;
+  qmenu.querySelector('[data-m=down]').disabled = i>=selected.length-1;
+  qmenuScrim.hidden=false; qmenu.hidden=false;
+  const r=btn.getBoundingClientRect(), mw=qmenu.offsetWidth, mh=qmenu.offsetHeight;
+  let top=r.bottom+6, left=r.right-mw;
+  if(top+mh>innerHeight-8) top=r.top-mh-6;
+  if(left<8) left=8;
+  qmenu.style.top=top+'px'; qmenu.style.left=left+'px';
+}
+function closeQMenu(){ qmenu.hidden=true; qmenuScrim.hidden=true; qmenuI=-1; }
+qmenuScrim.addEventListener('click',closeQMenu);
+qmenu.addEventListener('click',e=>{
+  const b=e.target.closest('[data-m]'); if(!b||b.disabled) return;
+  const i=qmenuI; closeQMenu();
+  if(b.dataset.m==='up') move(i,-1);
+  else if(b.dataset.m==='down') move(i,1);
+  else if(b.dataset.m==='dup') dup(i);
+  else removeAt(i);
+});
+
 queueList.addEventListener('click',e=>{
   const pill=e.target.closest('.qtime');
   if(pill){
@@ -973,6 +1039,8 @@ queueList.addEventListener('click',e=>{
     else openTedit({kind:'code', i:+pill.dataset.i});
     return;
   }
+  const kebab=e.target.closest('.qkebab');
+  if(kebab){ openQMenu(kebab, +kebab.dataset.i); return; }
   const b=e.target.closest('.qbtn'); if(!b)return;
   const i=+b.dataset.i;
   if(b.dataset.act==='up')move(i,-1);
@@ -1015,8 +1083,13 @@ queueList.addEventListener('click',e=>{
     if(pendHandle&&capId!=null){ try{pendHandle.releasePointerCapture(capId);}catch(_){ } }
     if(dragRow){
       dragRow.classList.remove('lift');
+      const moved=selected[+dragRow.dataset.i];
       const next=rows().map(r=>selected[+r.dataset.i]);
-      dragRow=null; selected=next; saveQueue(); renderQueue(); haptic();
+      if(showTimes()){
+        const pos=next.indexOf(moved);
+        moved.time = pos>0 ? next[pos-1].time : null;   // adopt row above; top blank zone clears it
+      }
+      dragRow=null; selected=next; sortSelected(); saveQueue(); renderQueue(); haptic();
     }
     pendRow=null; pendHandle=null; capId=null;
   }
@@ -1094,14 +1167,14 @@ function loadFromHash(){
   });
   const pcm=hash.match(/pc=(\d{4})/);
   if(pcm) anchor=pcm[1].slice(0,2)+':'+pcm[1].slice(2);
-  if(add.length){ selected=add.slice(); saveQueue(); syncDock(); openQueue(); }
+  if(add.length){ selected=add.slice(); sortSelected(); saveQueue(); syncDock(); openQueue(); }
   history.replaceState(null,'',location.pathname);
 }
 document.getElementById('copyListBtn').addEventListener('click',copyList);
 document.getElementById('shareListBtn').addEventListener('click',shareList);
 if(navigator.share) document.getElementById('shareListBtn').hidden=false;
 /* ---- text size (low-vision zoom) ---- */
-const TS_STEPS=[1,1.15,1.3,1.5];
+const TS_STEPS=[0.5,0.6,0.7,0.8,0.9,1,1.15,1.3,1.5];
 let tScale=(function(){ try{ const v=parseFloat(localStorage.getItem('acr-textscale')); return TS_STEPS.includes(v)?v:1; }catch(e){ return 1; } })();
 function applyTS(){
   document.body.style.zoom=String(tScale);
