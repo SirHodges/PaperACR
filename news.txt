@@ -4,14 +4,10 @@
 # Top line shows first, then it cycles down the list. See the AI guide for details.
 
 <span style="color:red; font-weight:bold;">NEW</span> Times option: Turn on in Settings and tell me what you think
+Fixed time-selector-zoom issue on iOS devices (in settings)
 Backup ACR code picker if this site fails: PaperACR.COM
-Added default to keep list on refresh — Disable in 'Other Tools'
+Default keeps list on refresh - Disable in 'Other Tools'
 In response to feedback: Added font size increaser button (unofficial title)
-Added 'Recent' to help with your frequent codes
-Bo good to each other
-Added A-Z, 1-3 and recommended sort (At a request!)
-Screenshould stay on (new devices) viewing List (Another Request!)
 If you have any urgent paper issues, call the hotline at <span style="color:blue; font-weight:bold;">613‑580‑3355</span>
 Feedback and feature requests: <a href="mailto:David.Hodges@Ottawa.ca">David.Hodges@Ottawa.ca</a>
-CNO =/= Strikethrough: CNO if you can't get info. Strikethrough if not relevant for form
-An Octothorpe is the offical name for the # symbol
+Clouds often weigh more than 500,000 Kilos
