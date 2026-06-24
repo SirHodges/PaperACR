@@ -6,6 +6,6 @@
 <span style="color:red; font-weight:bold;">NEW</span> Times option: Turn on in Settings - might be default soon
 Backup ACR code picker if this site fails: PaperACR.COM
 This site has all the good stuff, though
-If you have any urgent paper issues, call the hotline at <span style="color:blue; font-weight:bold;">613‑580‑3355</span>
+The Hotline is being mothballed; submit a question in "Other Tools" (or ask your supt!)
 Feedback and feature requests: <a href="mailto:David.Hodges@Ottawa.ca">David.Hodges@Ottawa.ca</a>
 Sir Isaac Newton invented the color wheel in 1666
