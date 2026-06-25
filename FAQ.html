@@ -12,10 +12,6 @@
     --bg:#eef2f1; --panel:#ffffff; --ink:#13201d; --muted:#5d6f6a;
     --line:#dde5e2; --field:#f3f6f5; --accent:#0f766e; --accent-ink:#0b5a54;
   }
-  :root.dark{
-    --bg:#0e1513; --panel:#172420; --ink:#e7efeb; --muted:#94a8a1;
-    --line:#2a3a34; --field:#1f2d28; --accent:#1aa18f; --accent-ink:#5fd0bf;
-  }
   *{box-sizing:border-box}
   html,body{margin:0}
   body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;
@@ -38,10 +34,10 @@
   h1{font-family:'Archivo';font-weight:800;font-size:clamp(26px,6vw,36px);letter-spacing:-.02em;margin:0}
   .sub{color:var(--muted);margin:9px 0 0;font-size:15px}
 
-  /* category headers */
-  .cat{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;
-    color:var(--accent-ink);font-weight:700;margin:30px 2px 4px;padding-top:14px;border-top:1px solid var(--line)}
-  .cat:first-of-type{margin-top:18px;padding-top:0;border-top:0}
+  /* category heading */
+  .cat{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:700;margin:34px 2px 2px;padding-top:18px;border-top:1px solid var(--line)}
+  .cat:first-of-type{border-top:0;padding-top:6px;margin-top:16px}
 
   /* faq items */
   .faq-item{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-top:12px;overflow:hidden}
@@ -53,15 +49,14 @@
   .faq-item[open] .chev{transform:rotate(180deg);color:var(--accent)}
   .faq-item[open] summary{border-bottom:1px solid var(--line)}
   .answer{padding:16px 20px 20px;font-size:15.5px;line-height:1.65;color:var(--ink)}
-  .answer p{margin:0}
-  .answer ul{margin:10px 0 0;padding-left:22px}
+  .answer p{margin:0 0 10px}
+  .answer p:last-child{margin:0}
+  .answer ul{margin:6px 0 0;padding-left:20px}
   .answer li{margin:3px 0}
-  .answer ul+p{margin-top:10px}
   .answer a{color:var(--accent-ink);font-weight:600;text-decoration:underline}
   .answer a:hover{color:var(--accent)}
   @media (prefers-reduced-motion:reduce){.chev{transition:none}}
 </style>
-<script>(function(){try{var t=localStorage.getItem('acr-theme');if(!t)t=(window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches)?'dark':'light';if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();</script>
 </head>
 <body>
 <div class="wrap">
@@ -83,24 +78,22 @@
     <p class="sub">Updates and answers for the team.</p>
   </header>
 
-  <!-- To add a question, copy one block below and edit the text. -->
-  <h2 class="cat">Filling out the ACR</h2>
+  <!-- To add a question: copy a .faq-item block and edit the text. To add a section: copy a .cat heading. -->
+
+  <p class="cat">Filling out the ACR</p>
 
   <details class="faq-item">
-    <summary>Can you give us a "Mandatory Fields" guide?
+    <summary>What do I do if I run out of space on the ACR?
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </summary>
     <div class="answer">
-      <p>All fields on the paper form are mandatory. There should not be any blank fields once the ACR is complete. Use CNO or an initialed strikethrough for sections that can't be completed.</p>
-    </div>
-  </details>
-
-  <details class="faq-item">
-    <summary>What do I do if I run out of space in the Clinical Treatment / Procedures section?
-      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-    </summary>
-    <div class="answer">
-      <p>Start a second ACR. Strike through the front page of the second ACR with a single line and initial it, then make sure the Call # and page numbers are recorded accurately on both forms.</p>
+      <p>Start a second ACR. Because it's a continuation rather than a new patient, strike through the front page of the second form (Clinical Info / Physical Exam) with a single line and initial it. Then:</p>
+      <ul>
+        <li>The Call # must be on <strong>every</strong> page.</li>
+        <li>Number the pages correctly (1/2, 2/2, and so on).</li>
+        <li>If the call involves more than one patient, complete the demographic section on the additional form too.</li>
+      </ul>
+      <p>This applies whether you've run out of room in the procedures section or in the incident history / remarks (for example, on a code 72).</p>
     </div>
   </details>
 
@@ -109,7 +102,7 @@
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </summary>
     <div class="answer">
-      <p>Yes — the call number must be recorded on both pages of the ACR.</p>
+      <p>Yes — the Call # must be recorded on every page of the ACR.</p>
     </div>
   </details>
 
@@ -132,24 +125,67 @@
   </details>
 
   <details class="faq-item">
-    <summary>What do I write in the demographics for a code 71?
+    <summary>For the call type, do I check every box that applies or just the most pertinent one?
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </summary>
     <div class="answer">
-      <p>In the demographics section, add 'CNO' to the Name, Age, DOB, and Health Card Number fields.</p>
+      <p>Consult the completion reference on the <a href="form-guide.html">Form guide</a> for how this section should be filled out.</p>
     </div>
   </details>
 
   <details class="faq-item">
-    <summary>What goes in the signature box for a code 72 with no signature?
+    <summary>Will there be a "Mandatory Fields" guide?
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </summary>
     <div class="answer">
-      <p>Write 'CNO' in the signature box — please don't leave it blank.</p>
+      <p>All fields on the paper form are mandatory — there should be no blank fields once the ACR is complete. For anything that genuinely can't be filled in, use CNO or an initialed single-line strikethrough rather than leaving it blank.</p>
     </div>
   </details>
 
-  <h2 class="cat">Specific calls & procedures</h2>
+  <details class="faq-item">
+    <summary>How do the patient and sequence fields work on multi-patient or multi-vehicle calls?
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="answer">
+      <p>Coordinate with the other responders on scene to assign patient sequence numbers, so everyone's ACRs line up. On complex MVRs with multiple patients, the Ops Supt on scene should help sort this out.</p>
+    </div>
+  </details>
+
+  <p class="cat">On the call — times, dispatch &amp; data</p>
+
+  <details class="faq-item">
+    <summary>When can we call Comms for times?
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="answer">
+      <p>Please don't call Comms for times. You can get your Call # and times from MCAD — connect with your Supt if you need help with that process.</p>
+      <p><strong>Exception:</strong> you'll need to call CACC for times if you ran a call outside the Ottawa CACC borders.</p>
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary>Do we need to call dispatch with VSA information?
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="answer">
+      <p>Yes. They need to know:</p>
+      <ul>
+        <li>Whether it's suspicious or not</li>
+        <li>The patient's name</li>
+        <li>Code 5 vs. code 6</li>
+        <li>The BHP name/number if it's a pronouncement</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary>What priority do I document if I was upgraded or downgraded en route?
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="answer">
+      <p>Document the priority you were on when you booked 10-7. If anything about it is unusual — say you were downgraded but the patient turned out to be CTAS 1/2 on assessment — add a note in remarks or file an IR.</p>
+    </div>
+  </details>
 
   <details class="faq-item">
     <summary>Should I be transmitting my defib data?
@@ -161,47 +197,57 @@
   </details>
 
   <details class="faq-item">
-    <summary>Do we need to call dispatch with VSA information?
+    <summary>Is there a hospital code for Gatineau?
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </summary>
     <div class="answer">
-      <p>Yes please. They need to know if suspicious or not, pt name, code 5 vs code 6, BHP name/number if it's a pronouncement.</p>
+      <p>Hospital number codes are for Ontario hospitals only. Use <strong>QGAT</strong> or <strong>QHUL</strong> for Gatineau or Hull. For any other Quebec hospital, call dispatch for the answer.</p>
     </div>
   </details>
 
+  <p class="cat">Paperwork &amp; process</p>
+
   <details class="faq-item">
-    <summary>Have there been any change in the procedure for reporting elder abuse?
+    <summary>Which envelope should PRUs and special teams use?
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </summary>
     <div class="answer">
-      <p>No changes to the procedure! Call the Vulnerable Persons Reporting Line at 613‑580‑2424 ext. 23499 and leave a voicemail with:</p>
+      <p>All regular Ops T3s should use the new black-and-white envelopes. Spec Ops and PRU are fine to use up the old coloured (purple/orange) envelopes, as long as they fill out:</p>
       <ul>
-        <li>Truck number</li>
-        <li>Date of pick-up</li>
-        <li>Address of pick-up</li>
-        <li>Call number</li>
+        <li>Date, names, Call #, times</li>
+        <li>Patient name, pickup location, transport destination</li>
+        <li>Truck number and DEFIB</li>
       </ul>
-      <p>Do not include any patient information in the voicemail. They'll track down the form and go from there.</p>
-    </div>
-  </details>
-
-  <h2 class="cat">Background & program updates</h2>
-
-  <details class="faq-item">
-    <summary>Why do I need to fill out the trip sheet?
-      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-    </summary>
-    <div class="answer">
-      <p>CAD data isn't stored. That trip sheet is now your record of what calls you did that day. 20 years in the future, that trip sheet is still stored in the event the lawyers or ministry needs to find the information. <i>PS note: we also use them to track compliment letters (cause patients are NOT good at remembering your names)</i></p>
     </div>
   </details>
 
   <details class="faq-item">
-    <summary>Why do we need to stop the SMART program for now?
+    <summary>What do I do about an amendment if the ACR and shift pack are already submitted to QA?
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </summary>
     <div class="answer">
-      <p>Without digital forms, we have no way to reliably follow up with patients, so sadly, we need to pause the program.</p>
+      <p>Don't modify the original. Per the ACR Completion manual, document the correction or omission in a clearly identified <strong>addendum</strong> that accompanies the original ACR, following the usual distribution requirements.</p>
+      <p>The exact submission process for after-the-fact amendments is still being finalized — check with your Supt if you're unsure.</p>
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary>Do we still complete an ACR for every vehicle on scene, or move to one document per patient?
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="answer">
+      <p>For now, please continue to complete an ACR for each vehicle that 10-7s. It goes a long way to help the records techs reconcile a large volume of paperwork while they smooth out their filing process. We'll revisit this as things settle.</p>
+    </div>
+  </details>
+
+  <p class="cat">Program updates</p>
+
+  <details class="faq-item">
+    <summary>Why do we need to pause the SMART program?
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="answer">
+      <p>Without digital forms, we have no reliable way to follow up with patients, so we need to pause the program for now.</p>
     </div>
   </details>
 
@@ -210,7 +256,16 @@
       <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </summary>
     <div class="answer">
-      <p>We can't continue studies if we can't reliably capture the data contemporaneously. Epidose packets are being pulled from the kits to make it less confusing on hot calls. We'll update you again when we can go live!</p>
+      <p>We can't continue studies if we can't reliably capture the data contemporaneously. Epidose packets are being pulled from the kits to make things less confusing on hot calls. We'll update you again when we can go live!</p>
+    </div>
+  </details>
+
+  <details class="faq-item">
+    <summary>How long until we have a new EPCR?
+      <svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="answer">
+      <p>We can't estimate that yet with the information currently available. We'll share more as soon as we know.</p>
     </div>
   </details>
 
