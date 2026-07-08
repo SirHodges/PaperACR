@@ -1249,6 +1249,14 @@ loadFromHash();
 
   if(closeBtn) closeBtn.addEventListener('click',()=>{ dismissed=true; if(timer)clearInterval(timer); banner.style.display='none'; });
 
+  /* Track clicks on any link inside the news banner, however many news.txt
+     puts there and however often it rotates (delegated, so it survives
+     innerHTML swaps). One combined counter for all news links. */
+  msgEl.addEventListener('click', e=>{
+    const a=e.target.closest('a');
+    if(a) pingCount('newslink');
+  });
+
   render(); // show fallback instantly
 
   /* Pull live news, then swap it in. One item per line; blank lines and
