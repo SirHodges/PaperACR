@@ -4,7 +4,7 @@
 # Top line shows first, then it cycles down the list. See the AI guide for details.
 
 
-Turn on Timestamps in Settings
+
 <a href="https://docs.google.com/forms/d/10V9hJUad4-_m9o6lqSRUDVCbCI0dMVRiwNqmYELvRAw/viewform?edit_requested=true">Epidose Feedback survey: chance to win $25! (External link)</a>
 Questions? Suggestions to improve this tool? Submit them in question in "Other Tools"
 Or email me at <a href="mailto:David.Hodges@Ottawa.ca">David.Hodges@Ottawa.ca</a>
