@@ -769,9 +769,9 @@ function openAbbrev(){
 }
 function openOtherTools(){
   const opts=[
-    {t:"Form guide", sub:"ACR completion walkthrough", href:"form-guide.html"},
+    {t:"Form guide", sub:"ACR completion walkthrough", href:"form-guide.html", count:"formguide"},
     {t:"Ministry Approved abbreviations", act:"abbrev"},
-    {t:"Sample forms", sub:"Completed ACR examples", href:"sample_forms.html"},
+    {t:"Sample forms", sub:"Completed ACR examples", href:"sample_forms.html", count:"sampleforms"},
     {t:"Submit a question", sub:"External link to MS Forms", href:"https://forms.cloud.microsoft/r/gssS0sBkaZ", ext:true}
   ];
   showModal('Other resources', toolGrid(opts));
@@ -790,14 +790,17 @@ function toolGrid(opts){
     if(!o) return `<button class="toolopt is-empty" disabled aria-label="Reserved for a future option"></button>`;
     const inner=`<span class="toolopt-t">${esc(o.t)}</span>`+(o.sub?`<span class="toolopt-sub">${esc(o.sub)}</span>`:'');
     return o.href
-      ? `<a class="toolopt" href="${o.href}"${o.ext?' target="_blank" rel="noopener"':''}>${inner}</a>`
+      ? `<a class="toolopt" href="${o.href}"${o.ext?' target="_blank" rel="noopener"':''}${o.count?` data-count="${o.count}"`:''}>${inner}</a>`
       : `<button class="toolopt" data-act="${o.act}">${inner}</button>`;
   }).join('')+`</div>`;
 }
 
 document.getElementById('otherToolsBtn').addEventListener('click',openOtherTools);
 document.getElementById('settingsBtn').addEventListener('click',openSettings);
-document.getElementById('quickrefBtn').addEventListener('click',openQuickref);
+document.getElementById('quickrefBtn').addEventListener('click',()=>{ pingCount('quickref'); openQuickref(); });
+document.getElementById('faqBtn').addEventListener('click',()=>pingCount('faq'));
+/* Track taps on resource links inside any modal (Form guide, Sample forms, …) */
+modalBody.addEventListener('click',e=>{ const a=e.target.closest('a[data-count]'); if(a) pingCount(a.dataset.count); });
 document.getElementById('closeModal').addEventListener('click',closeModal);
 document.getElementById('modalBack').addEventListener('click',()=>{const mb=document.getElementById('modalBack'); if(mb._fn) mb._fn();});
 modalBody.addEventListener('click',e=>{const b=e.target.closest('[data-act]'); if(!b) return;
