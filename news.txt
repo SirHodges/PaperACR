@@ -3,7 +3,8 @@
 # Lines starting with # are comments (ignored). HTML is allowed.
 # Top line shows first, then it cycles down the list. See the AI guide for details.
 
-I ran out of time to update this daily, but I still think you're kinda cool. 
+I'm migrating servers, or some such. If Webstaff.ca or Telestaff.ca start failing, use:
+https://ottawaparamedic-tsc.prd.mykronos.com/telestaff/
 
 Questions? Suggestions to improve this tool? "Submit a question" in "Other Resources" with your idea
 
