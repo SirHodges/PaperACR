@@ -5,6 +5,7 @@
 
 I'm migrating servers, or some such. If Webstaff.ca or Telestaff.ca start failing, use:
 https://ottawaparamedic-tsc.prd.mykronos.com/telestaff/
+Please fill in ALL sections of the Refusal! "CNO" is absolutely ok to use if appropriate
 
 Questions? Suggestions to improve this tool? "Submit a question" in "Other Resources" with your idea
 
