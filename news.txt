@@ -3,9 +3,6 @@
 # Lines starting with # are comments (ignored). HTML is allowed.
 # Top line shows first, then it cycles down the list. See the AI guide for details.
 
-I'm migrating servers, or some such. If Webstaff.ca or Telestaff.ca start failing, use:
+If Webstaff.ca or Telestaff.ca start failing, use:
 https://ottawaparamedic-tsc.prd.mykronos.com/telestaff/
-Please fill in ALL sections of the Refusal! "CNO" is absolutely ok to use if appropriate
-
-Questions? Suggestions to improve this tool? "Submit a question" in "Other Resources" with your idea
-
+<span style="display:inline-block;background:var(--accent);color:#fff;font-weight:700;padding:2px 8px;border-radius:999px;margin-right:4px">9,000</span> code lists and counting. How cool is that? Y'all are amazing.
