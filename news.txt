@@ -3,4 +3,5 @@
 # Lines starting with # are comments (ignored). HTML is allowed.
 # Top line shows first, then it cycles down the list. See the AI guide for details.
 
+If Webstaff.ca or Telestaff.ca start failing, use the <a href="https://ottawaparamedic-tsc.prd.mykronos.com/telestaff/" target="_blank" rel="noopener">backup Telestaff link</a>
 Good luck out there!
