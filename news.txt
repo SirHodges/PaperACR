@@ -3,6 +3,4 @@
 # Lines starting with # are comments (ignored). HTML is allowed.
 # Top line shows first, then it cycles down the list. See the AI guide for details.
 
-If Webstaff.ca or Telestaff.ca start failing, use:
-https://ottawaparamedic-tsc.prd.mykronos.com/telestaff/
-<span style="display:inline-block;background:var(--accent);color:#fff;font-weight:700;padding:2px 8px;border-radius:999px;margin-right:4px">9,000</span> code lists and counting. How cool is that? Y'all are amazing.
+Good luck out there!
