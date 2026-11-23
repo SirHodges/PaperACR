@@ -128,6 +128,32 @@
   .ts-btn:disabled{opacity:.4;cursor:default;border-color:var(--line);color:var(--ink)}
   .ts-val{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);min-width:42px;text-align:center}
 
+  /* clinical programs */
+  .progrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+  .progbtn .chev{transition:transform .2s}
+  .progbtn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  .progbtn.has-active{border-color:var(--accent);color:var(--accent-ink)}
+  .bubbles{display:flex;flex-wrap:wrap;gap:8px}
+  .bubble{font:600 13px 'Inter',sans-serif;cursor:pointer;border:1px solid var(--accent);
+    background:var(--form-bg);color:var(--accent-ink);padding:7px 13px;border-radius:999px;transition:.12s}
+  .bubble:hover{background:var(--panel)}
+  .bubble[aria-pressed="true"]{background:var(--accent);color:#fff}
+  .row.is-prog{border-left:3px solid var(--accent);background:var(--form-bg)}
+  .progtag{display:inline-block;vertical-align:middle;margin-left:6px;font:700 10px 'JetBrains Mono',monospace;
+    letter-spacing:.02em;color:#fff;background:var(--accent);border-radius:999px;padding:2px 7px}
+  .proginfo{background:var(--panel);border:1px solid var(--accent);border-left:4px solid var(--accent);
+    border-radius:12px;padding:13px 16px;font-size:14px}
+  .pi-h{font:800 16px 'Archivo',sans-serif;color:var(--accent-ink);margin:0 0 6px}
+  .proginfo ul{margin:0;padding-left:20px}
+  .proginfo li{margin:3px 0}
+  .pi-lbl{font:700 11px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
+    background:var(--common-bg);border-radius:6px;padding:5px 9px;margin:12px 0 9px}
+  .pi-ret{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+  .pi-code{font:700 14px 'JetBrains Mono',monospace;color:#fff;background:var(--accent);border-radius:9px;
+    padding:9px 12px;white-space:nowrap}
+  .progdiv{font:700 11px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+    padding:6px 2px 0}
+
   /* results */
   #list{margin-top:14px;display:flex;flex-direction:column;gap:8px}
   .row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;
@@ -429,6 +455,14 @@
         <button class="ts-btn" id="tsUp" type="button" aria-label="Increase text size">A+</button>
       </div>
     </div>
+    <div class="progrow">
+      <button class="sortbtn progbtn" id="progBtn" type="button" aria-expanded="false" aria-controls="progBubbles">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></svg>
+        <span id="progLabel">Clinical Programs</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="bubbles" id="progBubbles" role="group" aria-label="Clinical programs" hidden></div>
+    </div>
   </div>
 
   <div id="list"></div>
@@ -628,8 +662,11 @@ function render(){
   }else{
     items.sort((a,b)=>a.cat.localeCompare(b.cat)||a.t.localeCompare(b.t));
   }
+  /* typing a program's name (e.g. "sm", "smart") brings that program's codes to the top */
+  const typedProg=(q.length>=2 && !activeProgram())
+    ? PROGRAMS.find(p=>[p.name,p.tag].some(s=>norm(s).startsWith(q))) || null : null;
   countEl.textContent=items.length+(items.length===1?' code':' codes');
-  if(!items.length){
+  if(!items.length && !typedProg){
     if(filter==='recent' && !q){
       list.innerHTML='<div class="empty"><h2>No recent codes yet</h2><p>Codes you add to your list will show up here.</p></div>';
     }else{
@@ -640,17 +677,64 @@ function render(){
     return;
   }
   items=applySort(items);
+  /* clinical program: pull its codes to the top (all of them when not searching, matches only when searching) */
+  const prog=activeProgram()||typedProg;
+  let pinned=[];
+  if(prog){
+    const inProg=d=>prog.codes.includes(d.c);
+    pinned = (q && !typedProg) ? items.filter(inProg) : prog.codes.map(c=>BY_CODE[c]).filter(Boolean);
+    items = items.filter(d=>!inProg(d));
+    const n=pinned.length+items.length; countEl.textContent=n+(n===1?' code':' codes');
+  }
   const cap=q?300:items.length;
-  renderedItems=items.slice(0,cap);
-  list.innerHTML=renderedItems.map((d,i)=>{
+  renderedItems=pinned.concat(items.slice(0,cap));
+  const rowHTML=(d,i)=>{
+    const isProg=i<pinned.length;
     const badge=d.src==='local'?'<span class="badge b-local">Local</span>':'';
     const star=d.common?'<span class="star" title="Common — every call">★</span>':'';
-    return `<div class="row ${d.common?'is-common':''}" data-ri="${i}" tabindex="0" role="button" aria-label="Add ${escAttr(d.c+': '+d.t)}">
+    return `<div class="row ${d.common?'is-common':''} ${isProg?'is-prog':''}" data-ri="${i}" tabindex="0" role="button" aria-label="Add ${escAttr(d.c+': '+d.t)}">
       <span class="code">${esc(d.c)}</span>
-      <span class="meta"><div class="title">${star}${highlight(d.t,q)}${d.new?'<span class="newtag">New</span>':''}</div><div class="cat">${esc(d.cat)}</div></span>
+      <span class="meta"><div class="title">${star}${highlight(d.t,q)}${d.new?'<span class="newtag">New</span>':''}${isProg?`<span class="progtag">${esc(prog.tag)}</span>`:''}</div><div class="cat">${esc(d.cat)}</div></span>
       <span class="right">${badge}<span class="plus">+</span></span></div>`;
-  }).join('');
+  };
+  let html=renderedItems.map(rowHTML);
+  if(pinned.length && renderedItems.length>pinned.length) html.splice(pinned.length,0,`<div class="progdiv">${q?'Other matches':'All other codes'}</div>`);
+  if(prog && prog.info) html.unshift(`<div class="proginfo" role="note"><div class="pi-h">${esc(prog.name)}</div>${prog.info}</div>`);
+  list.innerHTML=html.join('');
 }
+/* ---- clinical programs: add more by adding entries here ---- */
+const PROGRAMS=[
+  {id:'smart', name:'Smart Program', tag:'Smart', codes:['407','395','396','400'],
+   /* banner shown above the codes while this program is on (HTML allowed) */
+   info:`<ul>
+       <li>Document <b>Primary Care Practitioner</b>, <b>“Unattached”</b> if none</li>
+       <li>Patient or SDM contact information</li>
+     </ul>
+     <div class="pi-lbl">General Admin</div>
+     <div class="pi-ret"><span class="pi-code">Return code 77</span>
+       <span>Receiving Facility/Destination: write <b>“77.04”</b> or <b>“Smart Transport”</b></span></div>`}
+];
+let activeProg=null;
+function activeProgram(){ return PROGRAMS.find(p=>p.id===activeProg)||null; }
+const progBtn=document.getElementById('progBtn'), progBubbles=document.getElementById('progBubbles'),
+      progLabel=document.getElementById('progLabel');
+function drawPrograms(){
+  progBubbles.innerHTML=PROGRAMS.map(p=>
+    `<button class="bubble" type="button" data-prog="${p.id}" aria-pressed="${p.id===activeProg}">${esc(p.name)}</button>`).join('');
+  const ap=activeProgram();
+  progLabel.textContent=ap?'Clinical Programs: '+ap.tag:'Clinical Programs';
+  progBtn.classList.toggle('has-active',!!ap);
+}
+progBtn.addEventListener('click',()=>{
+  const open=progBubbles.hidden;
+  progBubbles.hidden=!open; progBtn.setAttribute('aria-expanded',open);
+});
+progBubbles.addEventListener('click',e=>{
+  const b=e.target.closest('[data-prog]'); if(!b) return;
+  activeProg = activeProg===b.dataset.prog ? null : b.dataset.prog;
+  drawPrograms(); render(); haptic();
+});
+drawPrograms();
 function applyChips(){document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed', c.dataset.f===filter?'true':'false'));}
 input.addEventListener('input',()=>{
   if(input.value.trim() && filter!=='all'){filter='all';applyChips();}
