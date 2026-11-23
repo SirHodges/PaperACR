@@ -148,6 +148,7 @@
   .proginfo li{margin:3px 0}
   .pi-lbl{font:700 11px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
     background:var(--common-bg);border-radius:6px;padding:5px 9px;margin:12px 0 9px}
+  .pi-h+.pi-lbl{margin-top:4px}
   .pi-ret{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
   .pi-code{font:700 14px 'JetBrains Mono',monospace;color:#fff;background:var(--accent);border-radius:9px;
     padding:9px 12px;white-space:nowrap}
@@ -706,7 +707,8 @@ function render(){
 const PROGRAMS=[
   {id:'smart', name:'Smart Program', tag:'Smart', codes:['407','395','396','400'],
    /* banner shown above the codes while this program is on (HTML allowed) */
-   info:`<ul>
+   info:`<div class="pi-lbl">In remarks section:</div>
+     <ul>
        <li>Document <b>Primary Care Practitioner</b>, <b>“Unattached”</b> if none</li>
        <li>Patient or SDM contact information</li>
      </ul>
